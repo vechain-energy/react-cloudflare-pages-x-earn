@@ -9,7 +9,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     await hre.deployments.deploy('X2EarnRewardsPoolMock', {
         from: deployer,
         args: [
-            (await hre.deployments.get('B3TR')).address
+            (await hre.deployments.get('B3TRMock')).address
         ]
     })
 };

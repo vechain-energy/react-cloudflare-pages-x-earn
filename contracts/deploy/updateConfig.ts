@@ -11,7 +11,10 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     const Addresses = { B3TR, X2EarnRewardsPool, X2EarnApp }
     const ABI = [...(await hre.deployments.get('X2EarnApp')).abi]
 
-    const configFile = path.join(__dirname, "..", "..", "config.ts")
+    const configPath = path.join(__dirname, "..", "..", "dist")
+    if (!fs.existsSync(configPath)) { fs.mkdirSync(configPath) }
+
+    const configFile = path.join(configPath, "config.ts")
     const configData = `
 export const Addresses = ${JSON.stringify(Addresses)}
 export const ABI = ${JSON.stringify(ABI)}

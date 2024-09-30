@@ -1,3 +1,7 @@
 node_modules
 .turbo
-config.json
+
+# temp build outputs
+dist/config.json
+contracts/deployments/vechain_solo/
+data/thor

@@ -5,15 +5,25 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "contracts:install": "cd contracts; npm install --legacy-peer-deps",
-    "website:install": "cd website; npm install",
-    "contracts:build": "cd contracts; npm run build",
-    "website:build": "cd website; npm run build",
-    "contracts:deploy:testnet": "cd contracts; npm run deploy:testnet",
+    "contracts:install": "npm install --legacy-peer-deps --prefix contracts",
+    "website:install": "npm install --prefix website",
+
+    "contracts:build": "npm run build --prefix contracts",
+    "website:build": "npm run build --prefix website",
     "build": "npm run contracts:build && npm run website:build",
-    "website:start": "cd website; npm run start",
-    "dev": "npm run contracts:deploy:testnet && npm run website:start",
-    "install:all": "npm run contracts:install && npm run website:install"
+    "clean": "npm run contracts:solo:down && rm -rf data/* contracts/deployments/vechain_solo",
+
+    "contracts:deploy:testnet": "npm run deploy:testnet --prefix contracts",
+    "contracts:deploy:solo": "npm run deploy:solo --prefix contracts",
+    "website:start": "npm run start --prefix website",
+
+    "dev:testnet": "npm run contracts:deploy:testnet && npm run website:start",
+    "dev": "npm run contracts:solo:up && npm run contracts:deploy:solo && npm run website:start",
+
+    "install:all": "npm run contracts:install && npm run website:install",
+
+    "contracts:solo:up": "npm run solo:up --prefix contracts",
+    "contracts:solo:down": "npm run solo:down --prefix contracts"
   },
   "keywords": [],
   "author": "",

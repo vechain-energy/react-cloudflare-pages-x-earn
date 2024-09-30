@@ -32,6 +32,19 @@ const config = {
       chainId: 1337,
       gas: 10000000
     },
+    vechain_solo: {
+      url: "http://localhost:8669",
+      accounts: {
+        mnemonic: 'denial kitchen pet squirrel other broom bar gas better priority spoil cross',
+        count: 10,
+        path: "m/44'/818'/0'/0",
+      },
+      restful: true,
+      gas: 'auto',
+      gasPrice: 'auto',
+      gasMultiplier: 1,
+      loggingEnabled: true,
+    },
     vechain_testnet: {
       url: "https://node-testnet.vechain.energy",
       accounts,

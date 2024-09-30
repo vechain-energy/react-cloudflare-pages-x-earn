@@ -1,7 +1,7 @@
 import React from 'react';
 import { APP_DESCRIPTION, APP_TITLE, Addresses, ABI } from '~/config';
 import { useWallet, useConnex } from '@vechain/dapp-kit-react';
-import { clauseBuilder, unitsUtils } from '@vechain/sdk-core';
+import { clauseBuilder, addressUtils } from '@vechain/sdk-core';
 import Transaction from '~/common/Transaction';
 import ErrorMessage from '~/common/ErrorMessage';
 
@@ -60,7 +60,6 @@ export default function BuyCoffee() {
         <div className='space-y-4 max-w-lg'>
             <div className='text-xl font-semibold'>{APP_TITLE}</div>
             <p>{APP_DESCRIPTION}</p>
-
 
             <div>
                 <button

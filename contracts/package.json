@@ -40,6 +40,9 @@
     "coverage": "hardhat coverage",
     "typechain": "hardhat typechain",
     "deploy": "npx dotenvx run -- hardhat deploy",
-    "deploy:testnet": "npx dotenvx run -- hardhat deploy --network vechain_testnet"
+    "deploy:testnet": "npx dotenvx run -- hardhat deploy --network vechain_testnet",
+    "deploy:solo": "npx dotenvx run -- hardhat deploy --network vechain_solo",
+    "solo:up": "docker compose up -d",
+    "solo:down": "docker compose down"
   }
 }
