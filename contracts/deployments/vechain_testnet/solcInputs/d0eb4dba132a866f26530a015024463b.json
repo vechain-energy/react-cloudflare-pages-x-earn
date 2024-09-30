@@ -1,0 +1,39 @@
+{
+  "language": "Solidity",
+  "sources": {
+    "contracts/interfaces/IX2EarnRewardsPool.sol": {
+      "content": "// SPDX-License-Identifier: MIT\n\npragma solidity 0.8.20;\n\n/**\n * @title IX2EarnRewardsPool\n * @dev Interface designed to be used by a contract that allows x2Earn apps to reward users that performed sustainable actions.\n * Funds can be deposited into this contract by specifying the app id that can access the funds.\n * Admins of x2EarnApps can withdraw funds from the rewards pool, whihc are sent to the team wallet.\n */\ninterface IX2EarnRewardsPool {\n    /**\n     * @dev Event emitted when a new deposit is made into the rewards pool.\n     *\n     * @param amount The amount of $B3TR deposited.\n     * @param appId The ID of the app for which the deposit was made.\n     * @param depositor The address of the user that deposited the funds.\n     */\n    event NewDeposit(uint256 amount, bytes32 indexed appId, address indexed depositor);\n\n    /**\n     * @dev Event emitted when a team withdraws funds from the rewards pool.\n     *\n     * @param amount The amount of $B3TR withdrawn.\n     * @param appId The ID of the app for which the withdrawal was made.\n     * @param teamWallet The address of the team wallet that received the funds.\n     * @param withdrawer The address of the user that withdrew the funds.\n     * @param reason The reason for the withdrawal.\n     */\n    event TeamWithdrawal(uint256 amount, bytes32 indexed appId, address indexed teamWallet, address withdrawer, string reason);\n\n    /**\n     * @dev Event emitted when a reward is emitted by an app.\n     *\n     * @param amount The amount of $B3TR rewarded.\n     * @param appId The ID of the app that emitted the reward.\n     * @param receiver The address of the user that received the reward.\n     * @param proof The proof of the sustainable action that was performed.\n     * @param distributor The address of the user that distributed the reward.\n     */\n    event RewardDistributed(uint256 amount, bytes32 indexed appId, address indexed receiver, string proof, address indexed distributor);\n\n    /**\n     * @dev Retrieves the current version of the contract.\n     *\n     * @return The version of the contract.\n     */\n    function version() external pure returns (string memory);\n\n    /**\n     * @dev Function used by x2earn apps to deposit funds into the rewards pool.\n     *\n     * @param amount The amount of $B3TR to deposit.\n     * @param appId The ID of the app.\n     */\n    function deposit(uint256 amount, bytes32 appId) external returns (bool);\n\n    /**\n     * @dev Function used by x2earn apps to withdraw funds from the rewards pool.\n     *\n     * @param amount The amount of $B3TR to withdraw.\n     * @param appId The ID of the app.\n     * @param reason The reason for the withdrawal.\n     */\n    function withdraw(uint256 amount, bytes32 appId, string memory reason) external;\n\n    /**\n     * @dev Gets the amount of funds available for an app to reward users.\n     *\n     * @param appId The ID of the app.\n     */\n    function availableFunds(bytes32 appId) external view returns (uint256);\n\n    /**\n     * @dev Function used by x2earn apps to reward users that performed sustainable actions.\n     *\n     * @param appId the app id that is emitting the reward\n     * @param amount the amount of B3TR token the user is rewarded with\n     * @param receiver the address of the user that performed the sustainable action and is rewarded\n     * @param proof deprecated argument, pass an empty string instead\n     */\n    function distributeReward(bytes32 appId, uint256 amount, address receiver, string memory proof) external;\n\n    /**\n     * @dev Function used by x2earn apps to reward users that performed sustainable actions.\n     * @notice This function is depracted in favor of distributeRewardWithProof.\n     *\n     * @param appId the app id that is emitting the reward\n     * @param amount the amount of B3TR token the user is rewarded with\n     * @param receiver the address of the user that performed the sustainable action and is rewarded\n     * @param proof the JSON string that contains the proof and impact of the sustainable action\n     */\n    function distributeRewardDeprecated(bytes32 appId, uint256 amount, address receiver, string memory proof) external;\n\n    /**\n     * @dev Function used by x2earn apps to reward users that performed sustainable actions.\n     *\n     * @param appId the app id that is emitting the reward\n     * @param amount the amount of B3TR token the user is rewarded with\n     * @param receiver the address of the user that performed the sustainable action and is rewarded\n     * @param proofTypes the types of the proof of the sustainable action\n     * @param proofValues the values of the proof of the sustainable action\n     * @param impactCodes the codes of the impacts of the sustainable action\n     * @param impactValues the values of the impacts of the sustainable action\n     * @param description the description of the sustainable action\n     */\n    function distributeRewardWithProof(\n        bytes32 appId,\n        uint256 amount,\n        address receiver,\n        string[] memory proofTypes, // link, image, video, text, etc.\n        string[] memory proofValues, // \"https://...\", \"Qm...\", etc.,\n        string[] memory impactCodes, // carbon, water, etc.\n        uint256[] memory impactValues, // 100, 200, etc.,\n        string memory description\n    ) external;\n\n    /**\n     * @dev Builds the JSON proof string that will be stored\n     * on chain regarding the proofs, impacts and description of the sustainable action.\n     *\n     * @param proofTypes the types of the proof of the sustainable action\n     * @param proofValues the values of the proof of the sustainable action\n     * @param impactCodes the codes of the impacts of the sustainable action\n     * @param impactValues the values of the impacts of the sustainable action\n     * @param description the description of the sustainable action\n     */\n    function buildProof(\n        string[] memory proofTypes, // link, photo, video, text, etc.\n        string[] memory proofValues, // \"https://...\", \"Qm...\", etc.,\n        string[] memory impactCodes, // carbon, water, etc.\n        uint256[] memory impactValues, // 100, 200, etc.,\n        string memory description\n    ) external returns (string memory);\n}"
+    },
+    "contracts/X2EarnApp.sol": {
+      "content": "// SPDX-License-Identifier: MIT\n// Compatible with OpenZeppelin Contracts ^5.0.0\npragma solidity ^0.8.20;\n\nimport \"./interfaces/IX2EarnRewardsPool.sol\";\n\ncontract X2EarnApp {\n    IX2EarnRewardsPool public rewardsPool;\n    constructor(IX2EarnRewardsPool _rewardsPool) {\n        rewardsPool = _rewardsPool;\n    }\n\n    function reward() public {\n        rewardsPool.distributeReward(bytes32(0), 1, msg.sender, \"\");\n    }\n}\n"
+    }
+  },
+  "settings": {
+    "evmVersion": "paris",
+    "optimizer": {
+      "enabled": false,
+      "runs": 200
+    },
+    "outputSelection": {
+      "*": {
+        "*": [
+          "abi",
+          "evm.bytecode",
+          "evm.deployedBytecode",
+          "evm.methodIdentifiers",
+          "metadata",
+          "storageLayout",
+          "devdoc",
+          "userdoc",
+          "evm.gasEstimates"
+        ],
+        "": [
+          "ast"
+        ]
+      }
+    },
+    "metadata": {
+      "useLiteralContent": true
+    }
+  }
+}

@@ -1,0 +1,3 @@
+
+export const Addresses = {"B3TR":"0xB6f2D97244aD0589f1bC40Ea71793805Cc5CA252","X2EarnRewardsPool":"0xf0E6e63c3a2Caede69880d96Cb5a411284c8c8A8","X2EarnApp":"0x5c290b125350BF0A01D19D189599A6a484ad01c1"}
+export const ABI = [{"inputs":[{"internalType":"contract IX2EarnRewardsPool","name":"_rewardsPool","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},{"inputs":[],"name":"reward","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"rewardsPool","outputs":[{"internalType":"contract IX2EarnRewardsPool","name":"","type":"address"}],"stateMutability":"view","type":"function"}]

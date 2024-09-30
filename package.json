@@ -1,0 +1,25 @@
+{
+  "name": "react-cloudflare-pages-x-earn-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "contracts:install": "cd contracts; npm install --legacy-peer-deps",
+    "website:install": "cd website; npm install",
+    "contracts:build": "cd contracts; npm run build",
+    "website:build": "cd website; npm run build",
+    "contracts:deploy:testnet": "cd contracts; npm run deploy:testnet",
+    "build": "npm run contracts:build && npm run website:build",
+    "website:start": "cd website; npm run start",
+    "dev": "npm run contracts:deploy:testnet && npm run website:start",
+    "install:all": "npm run contracts:install && npm run website:install"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "turbo": "^2.1.2"
+  },
+  "packageManager": "npm@10.5.0"
+}
