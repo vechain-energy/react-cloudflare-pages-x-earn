@@ -3,5 +3,5 @@ node_modules
 
 # temp build outputs
 dist/config.json
-contracts/deployments/vechain_solo/
+apps/contracts/deployments/vechain_solo/
 data/thor

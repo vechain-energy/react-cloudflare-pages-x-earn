@@ -1,9 +1,7 @@
 # Init
 
 ```shell
-echo "PRIVATE_KEY=0x$(openssl rand -hex 32)" > contracts/.env
 npm install
-turbo run install
 ```
 
 
@@ -13,17 +11,13 @@ turbo run install
 turbo dev
 ```
 
-In another terminal to run the website API/Backend:
-
-```shell
-turbo website:backend
-```
-
 This will:
 
 - Run a local solo node
 - Deploy contracts on it
 - Start website in development mode
+- Start a CloudFlare Worker within the pages
+    - with fee delegation
 
 You need to:
 
@@ -32,3 +26,11 @@ You need to:
 # Files
 
 * `dist/config.ts` is updated on contract deployments and used for contract access in website
+
+# Todo
+
+- [ ] Improve configuration to easier toggle between networks (especially solo/testnet)
+- [ ] Streamline environment configuration, to avoid duplication
+- [ ] Simplify turbo configuration
+- [ ] Create a demo deployment
+- [ ] Fix solo signing failing

@@ -5,26 +5,25 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "contracts:install": "npm install --legacy-peer-deps --prefix contracts",
-    "website:install": "npm install --prefix website",
+    "contracts:install": "cd apps/contracts; npm install --legacy-peer-deps",
+    "contracts:gen:randompk": "echo \"PRIVATE_KEY=0x$(openssl rand -hex 32)\" > ./apps/contracts/.env",
+    "website:install": "npm install --prefix apps/website",
 
-    "contracts:build": "npm run build --prefix contracts",
-    "website:build": "npm run build --prefix website",
+    "contracts:build": "npm run build --prefix apps/contracts",
+    "website:build": "npm run build --prefix apps/website",
     "build": "npm run contracts:build && npm run website:build",
-    "clean": "npm run contracts:solo:down && rm -rf data/* contracts/deployments/vechain_solo",
+    "clear": "rm -rf data/* apps/contracts/deployments/vechain_solo",
 
-    "contracts:deploy:testnet": "npm run deploy:testnet --prefix contracts",
-    "contracts:deploy:solo": "npm run deploy:solo --prefix contracts",
-    "website:start": "npm run start --prefix website",
-    "website:backend": "npm run dev:pages --prefix website",
+    "contracts:deploy:testnet": "npm run deploy:testnet --prefix apps/contracts",
+    "contracts:deploy:solo": "npm run deploy:solo --prefix apps/contracts",
+    "website:start": "npm run start --prefix apps/website",
+    "website:backend": "npm run dev:pages --prefix apps/website",
 
     "dev:testnet": "npm run contracts:deploy:testnet && npm run website:start",
-    "dev": "npm run contracts:solo:up && npm run contracts:deploy:solo && npm run website:start",
 
-    "install:all": "npm run contracts:install && npm run website:install",
-
-    "contracts:solo:up": "npm run solo:up --prefix contracts",
-    "contracts:solo:down": "npm run solo:down --prefix contracts"
+    "postinstall": "turbo install:all",
+    "contracts:solo:up": "npm run solo:up --prefix apps/contracts",
+    "contracts:solo:down": "npm run solo:down --prefix apps/contracts"
   },
   "keywords": [],
   "author": "",

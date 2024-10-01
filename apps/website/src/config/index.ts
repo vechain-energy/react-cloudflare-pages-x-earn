@@ -1,4 +1,4 @@
-export * from '~/../../dist/config.ts'
+export * from '~/../../../dist/config.ts'
 
 // obtain on https://cloud.walletconnect.com/
 // must be set to enable VeWorld mobile connections on Desktop

@@ -21,7 +21,7 @@ services:
             - --persist
 
         volumes:
-            - ../data/thor:/data/thor
+            - ../../data/thor:/data/thor
 
         healthcheck:
             # We run the health check using standard UNIX tools so we don't have to

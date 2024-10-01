@@ -11,7 +11,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     const Addresses = { B3TR, X2EarnRewardsPool, X2EarnApp }
     const ABI = [...(await hre.deployments.get('X2EarnApp')).abi]
 
-    const configPath = path.join(__dirname, "..", "..", "dist")
+    const configPath = path.join(__dirname, "..", "..", "..", "dist")
     if (!fs.existsSync(configPath)) { fs.mkdirSync(configPath) }
 
     const configFile = path.join(configPath, "config.ts")

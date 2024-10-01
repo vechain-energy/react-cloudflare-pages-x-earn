@@ -6,6 +6,7 @@
         "^build"
       ],
       "outputs": [
+        "data/**",
         "dist/**",
         "website/dist/**",
         "contracts/deployments/**"
@@ -18,12 +19,60 @@
     },
     "dev": {
       "persistent": true,
-      "cache": false
+      "cache": false,
+      "dependsOn": [
+        "contracts:deploy:solo",
+        "website:start",
+        "website:backend"
+      ]
     },
-    "install": {
+    "install:all": {
       "cache": false,
       "outputs": [],
-      "dependsOn": []
+      "dependsOn": [
+        "contracts:install",
+        "website:install",
+        "contracts:gen:randompk"
+      ]
+    },
+    "contracts:install": {
+      "cache": false
+    },
+    "website:install": {
+      "cache": false
+    },
+    "contracts:gen:randompk": {
+      "cache": false
+    },
+    "contracts:solo:up": {
+      "cache": false
+    },
+    "contracts:deploy:solo": {
+      "cache": false,
+      "dependsOn": [
+        "contracts:solo:up"
+      ]
+    },
+    "website:start": {
+      "cache": false
+    },
+    "website:backend": {
+      "cache": false
+    },
+    "clear": {
+      "cache": false,
+      "outputs": [
+        "data/**",
+        "dist/**",
+        "website/dist/**",
+        "contracts/deployments/**"
+      ],
+      "dependsOn": [
+        "contracts:solo:down"
+      ]
+    },
+    "contracts:solo:down": {
+      "cache": false
     }
   }
 }
