@@ -1,7 +1,7 @@
 import React from 'react';
-import { APP_DESCRIPTION, APP_TITLE, Addresses, ABI } from '~/config';
+import { APP_DESCRIPTION, APP_TITLE, Addresses, ABI, DELEGATION_URL } from '~/config';
 import { useWallet, useConnex } from '@vechain/dapp-kit-react';
-import { clauseBuilder, addressUtils } from '@vechain/sdk-core';
+import { clauseBuilder } from '@vechain/sdk-core';
 import Transaction from '~/common/Transaction';
 import ErrorMessage from '~/common/ErrorMessage';
 
@@ -39,6 +39,11 @@ export default function BuyCoffee() {
 
                 // requesting a specific signer will prevent the user from changing the signer to another wallet than the signed in one, preventing confusion
                 .signer(account)
+
+            // optionally use fee delegation
+            if (DELEGATION_URL) {
+                tx.delegate(DELEGATION_URL)
+            }
 
             // ask the user to sign the transaction
             const { txid } = await tx.request()

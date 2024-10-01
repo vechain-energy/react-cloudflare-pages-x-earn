@@ -13,6 +13,12 @@ turbo run install
 turbo dev
 ```
 
+In another terminal to run the website API/Backend:
+
+```shell
+turbo website:backend
+```
+
 This will:
 
 - Run a local solo node
@@ -22,10 +28,6 @@ This will:
 You need to:
 
 - Add network `http://localhost:8669` to VeWorld to make this work
-
-TODO:
-
-- [ ] Provide a local solo fee delegator to make this work instantly with all wallets
 
 # Files
 

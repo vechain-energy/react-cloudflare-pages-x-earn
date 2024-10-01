@@ -1,10 +1,12 @@
-import { DAppKitProvider } from '@vechain/dapp-kit-react';
+import { DAppKitProvider } from '@vechain/dapp-kit-react'; // Ensure Genesis is imported
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { NODE_URL, NETWORK, WALLET_CONNECT_PROJECT_ID, APP_TITLE, APP_DESCRIPTION, APP_ICONS, SOLO_BLOCK } from '~/config';
 import { Helmet } from "react-helmet";
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Layout from './Layout';
 import Homepage from './Homepage';
+
+type Genesis = 'main' | 'test' | Connex.Thor.Block;
 
 // define wallet connect options only in case a project id has been provided
 const walletConnectOptions = !WALLET_CONNECT_PROJECT_ID ? undefined : {
@@ -40,26 +42,20 @@ export default function App() {
 }
 
 function Providers({ children }: { children: React.ReactNode }) {
+    const genesis = ['main', 'test'].includes(NETWORK) ? NETWORK as Genesis
+        : NETWORK === 'solo' ? SOLO_BLOCK as Genesis
+        : undefined;
+
     return (
         <QueryClientProvider client={queryClient}>
             <DAppKitProvider
-                // the network & node to connect to
                 nodeUrl={NODE_URL}
-                {
-                ...(
-                    ['main', 'test'].includes(NETWORK) ? { genesis: NETWORK }
-                        : NETWORK === 'solo' ? { genesis: SOLO_BLOCK }
-                            : {}
-                )
-                }
-
-                // remember last connected address on page reload
+                genesis={genesis}
                 usePersistence={true}
-                // optionally enable walletConnect, which will be used for mobile wallets
                 walletConnectOptions={walletConnectOptions}
             >
                 {children}
             </DAppKitProvider>
-        </QueryClientProvider >
+        </QueryClientProvider>
     );
 }

@@ -16,6 +16,7 @@
     "contracts:deploy:testnet": "npm run deploy:testnet --prefix contracts",
     "contracts:deploy:solo": "npm run deploy:solo --prefix contracts",
     "website:start": "npm run start --prefix website",
+    "website:backend": "npm run dev:pages --prefix website",
 
     "dev:testnet": "npm run contracts:deploy:testnet && npm run website:start",
     "dev": "npm run contracts:solo:up && npm run contracts:deploy:solo && npm run website:start",

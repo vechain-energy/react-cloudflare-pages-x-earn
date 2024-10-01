@@ -1,4 +1,4 @@
-export * from '~//../../dist/config.ts'
+export * from '~/../../dist/config.ts'
 
 // obtain on https://cloud.walletconnect.com/
 // must be set to enable VeWorld mobile connections on Desktop
@@ -36,3 +36,6 @@ export const DELEGATION_URL = process.env.DELEGATION_URL
 export const APP_TITLE = process.env.APP_TITLE ?? "Vechain dApp";
 export const APP_DESCRIPTION = process.env.APP_DESCRIPTION ?? "This is an example dApp showcasing basic interaction with VeChain.";
 export const APP_ICONS = (process.env.APP_ICONS ?? "").split(',');
+
+// backend url, should by / in default deployment, but could be different (in development for example)
+export const BACKEND_URL = process.env.BACKEND_URL ?? '/'
