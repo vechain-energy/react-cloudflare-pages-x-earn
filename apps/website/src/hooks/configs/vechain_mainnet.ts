@@ -1,6 +1,6 @@
 export const mainnet = {
-    "id": "1176455790972829927178843975305401940018261314401477529965699268608" as unknown as number,
-    "name": "vechain_testnet",
+    "id": "14018334920824264607324960081104126964451224218731128041714701303808" as unknown as number,
+    "name": "vechain_mainnet",
     "network": "homestead",
     "nativeCurrency": {
         "name": "VeChainThor",
@@ -10,63 +10,68 @@ export const mainnet = {
     "rpcUrls": {
         "public": {
             "http": [
-                "https://node-testnet.vechain.energy"
+                "https://node-mainnet.vechain.energy"
             ]
         },
         "default": {
             "http": [
-                "https://node-testnet.vechain.energy"
+                "https://node-mainnet.vechain.energy"
             ]
         }
     },
     "contracts": {
         "ensRegistry": {
-            "address": "0xcBFB30c1F267914816668d53AcBA7bA7c9806D13" as `0x${string}`
+            "address": "0xa9231da8BF8D10e2df3f6E03Dd5449caD600129b" as `0x${string}`
         },
         "ensBaseRegistrarImplementation": {
-            "address": "0xca1B72286B96F30391aBB96C7d5e3Bf2D767927d" as `0x${string}`
+            "address": "0x6e04F400810Be5C570c08Ea2def43c4d44481063" as `0x${string}`
         },
         "ensDnsRegistrar": {
             "address": "0x0000000000000000000000000000000000000000" as `0x${string}`
         },
         "ensEthRegistrarController": {
-            "address": "0xAA854565401724f7061E0C366cA132c87C1e5F60" as `0x${string}`
+            "address": "0x07479F2710d16a0bACbE6C25b9b32447364C0A33" as `0x${string}`
         },
         "ensNameWrapper": {
-            "address": "0x67d8D01cF0d6d9ed2c120FfF1D4Fa86fC10C9D8e" as `0x${string}`
+            "address": "0x1c8Adf6d8E6302d042b1f09baD0c7f65dE3660eA" as `0x${string}`
         },
         "ensPublicResolver": {
-            "address": "0xA6eFd130085a127D090ACb0b100294aD1079EA6f" as `0x${string}`
+            "address": "0xabac49445584C8b6c1472b030B1076Ac3901D7cf" as `0x${string}`
         },
         "ensReverseRegistrar": {
-            "address": "0x6878f1aD5e3015310CfE5B38d7B7071C5D8818Ca" as `0x${string}`
+            "address": "0x5c970901a587BA3932C835D4ae5FAE2BEa7e78Bc" as `0x${string}`
         },
         "ensBulkRenewal": {
-            "address": "0x23aEe21815FDfcba86882c8b10502514a77eFd8A" as `0x${string}`
+            "address": "0x793eBb866c7Db6b3e6336861456938D67379d623" as `0x${string}`
         },
         "ensDnssecImpl": {
             "address": "0x0000000000000000000000000000000000000000" as `0x${string}`
         },
         "ensUniversalResolver": {
-            "address": "0x77fCCE52D4635F9a6a5E06e44aB05c0d5D96D187" as `0x${string}`
+            "address": "0x3dEB91b387d1e0A2ceB9aDd2AdF43Add1a922569" as `0x${string}`
         },
         "multicall3": {
-            "address": "0x736eAC86d704d8AD13Bb97628928c46dCb7Ad9ef" as `0x${string}`
+            "address": "0xfB906D3Ef66cb80fc2E7A79E03228a720b1401F6" as `0x${string}`
         },
         "vetResolveUtils": {
-            "address": "0xc403b8EA53F707d7d4de095f0A20bC491Cf2bc94" as `0x${string}`
+            "address": "0xA11413086e163e41901bb81fdc5617c975Fa5a1A" as `0x${string}`
         },
         "vetWeb2Domains": {
-            "address": "0xABfaE1B040e0474a70b120Fc32d638edB01F4aE6" as `0x${string}`
+            "address": "0x18BB2f517317fDbB8B207fa8f08DB35B88C2aa90" as `0x${string}`
         },
         "vetSignedRegistrarController": {
-            "address": "0x5022d5709d1A29d777F6426C3131619c8dbD4BFf" as `0x${string}`
+            "address": "0xCD0402b23D01133EfD5ABab0e2c82EA91926F136" as `0x${string}`
         },
         "vetNFTRegistrarController": {
-            "address": "0x66508ecD128Bf44035b46a0E5F548f09A2eAF40d" as `0x${string}`
+            "address": "0xc7bF178B1AbE7A9cE26F661189479d061c073cA5" as `0x${string}`
         },
         "venOracle": {
-            "address": "0xdcCAaBd81B38e0dEEf4c202bC7F1261A4D9192C6" as `0x${string}`
+            "address": "0x49eC7192BF804Abc289645ca86F1eD01a6C17713" as `0x${string}`
+        }
+    },
+    "subgraphs": {
+        "ens": {
+            "url": "https://graph.vet/subgraphs/name/vns/"
         }
     },
     "batch": {
@@ -75,7 +80,7 @@ export const mainnet = {
     "blockExplorers": {
         "default": {
             "name": "Explorer",
-            "url": "https://explore-testnet.vechain.org"
+            "url": "https://vechainstats.com"
         }
     }
 }
