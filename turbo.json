@@ -26,6 +26,15 @@
         "website:backend"
       ]
     },
+    "testnet": {
+      "persistent": true,
+      "cache": false,
+      "dependsOn": [
+        "contracts:deploy:testnet",
+        "website:start:testnet",
+        "website:backend"
+      ]
+    },
     "install:all": {
       "cache": false,
       "outputs": [],
@@ -54,6 +63,9 @@
       ]
     },
     "website:start": {
+      "cache": false
+    },
+    "website:start:testnet": {
       "cache": false
     },
     "website:backend": {

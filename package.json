@@ -17,6 +17,7 @@
     "contracts:deploy:testnet": "npm run deploy:testnet --prefix apps/contracts",
     "contracts:deploy:solo": "npm run deploy:solo --prefix apps/contracts",
     "website:start": "npm run start --prefix apps/website",
+    "website:start:testnet": "NODE_ENV=testnet npm run start --prefix apps/website",
     "website:backend": "npm run dev:pages --prefix apps/website",
 
     "dev:testnet": "npm run contracts:deploy:testnet && npm run website:start",
