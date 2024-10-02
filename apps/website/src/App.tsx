@@ -1,5 +1,5 @@
 import { NODE_URL, NETWORK, WALLET_CONNECT_PROJECT_ID, APP_TITLE, APP_DESCRIPTION, APP_ICONS, SOLO_BLOCK } from '~/config';
-import { DAppKitProvider } from '@vechain/dapp-kit-react'; // Ensure Genesis is imported
+import { DAppKitProvider, useWallet } from '@vechain/dapp-kit-react'; // Ensure Genesis is imported
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { useWagmiConfig } from './hooks/useWagmiConfig';
 import { WagmiProvider } from 'wagmi'
@@ -26,24 +26,24 @@ const queryClient = new QueryClient()
 
 export default function App() {
     return (
-        <VechainProviders>
+        <>
             <Helmet>
                 <meta charSet="utf-8" />
                 <title>{APP_TITLE}</title>
             </Helmet>
 
-            <Router>
+            <Providers>
                 <Layout>
                     <Routes>
                         <Route path="*" element={<Homepage />} />
                     </Routes>
                 </Layout>
-            </Router>
-        </VechainProviders>
+            </Providers>
+        </>
     )
 }
 
-function VechainProviders({ children }: { children: React.ReactNode }) {
+function Providers({ children }: { children: React.ReactNode }) {
     const genesis = ['main', 'test'].includes(NETWORK) ? NETWORK as Genesis
         : NETWORK === 'solo' ? SOLO_BLOCK as Genesis
             : undefined;
@@ -55,19 +55,22 @@ function VechainProviders({ children }: { children: React.ReactNode }) {
             usePersistence
             walletConnectOptions={walletConnectOptions}
         >
-            <AppProviders>{children}</AppProviders>
+            <DAppKitConsumers>{children}</DAppKitConsumers>
         </DAppKitProvider>
     );
 }
 
-function AppProviders({ children }: { children: React.ReactNode }) {
-    const wagmiConfig = useWagmiConfig()
+function DAppKitConsumers({ children }: { children: React.ReactNode }) {
+    const { config } = useWagmiConfig()
+    const wallet = useWallet()
 
     return (
-        <WagmiProvider config={wagmiConfig.config}>
-            <QueryClientProvider client={queryClient}>
-                {children}
-            </QueryClientProvider>
-        </WagmiProvider>
+        <Router>
+            <WagmiProvider config={config} reconnectOnMount={wallet.account ? true : false}>
+                <QueryClientProvider client={queryClient}>
+                    {children}
+                </QueryClientProvider>
+            </WagmiProvider>
+        </Router>
     );
 }

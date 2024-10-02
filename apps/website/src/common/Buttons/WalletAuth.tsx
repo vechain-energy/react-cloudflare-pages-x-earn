@@ -112,7 +112,7 @@ export function ConnectButton({ className }: { className?: string }) {
         <button
             type="button"
             className={className}
-            onClick={() => connect({ connector: connectors[0] })}
+            onClick={() => connect({ connector: connectors[0]! })}
         >
             Connect Wallet
         </button>

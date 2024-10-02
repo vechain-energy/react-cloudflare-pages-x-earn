@@ -34,3 +34,4 @@ You need to:
 - [ ] Simplify turbo configuration
 - [ ] Create a demo deployment
 - [ ] Fix solo signing failing
+- [ ] WAGMI Connector needs to access wallet changes without a configuration change

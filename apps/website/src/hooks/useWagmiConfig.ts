@@ -30,8 +30,8 @@ export function useWagmiConfig() {
 
         // build a new connector for vechain
         const connector = createConnector(() => ({
-            id: 'vechain',
-            name: 'vechain',
+            id: vechainNetwork.id,
+            name: vechainNetwork.name,
             type: 'wallet',
             connect: async () => {
                 if (!wallet.account) {
@@ -39,7 +39,7 @@ export function useWagmiConfig() {
                     const result = await wallet.connect()
                     return {
                         accounts: [result.account as `0x${string}`],
-                        chainId: vechainNetwork.id
+                        chainId: vechainNetwork.id,
                     }
                 }
 
@@ -61,6 +61,7 @@ export function useWagmiConfig() {
             onAccountsChanged: () => { },
             onChainChanged: () => { },
             onDisconnect: () => { },
+            setup: async () => { },
         }))
 
         // combine it into a valid configuration
