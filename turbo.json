@@ -21,7 +21,6 @@
       "persistent": true,
       "cache": false,
       "dependsOn": [
-        "contracts:deploy:solo",
         "website:start",
         "website:backend"
       ]
@@ -30,9 +29,8 @@
       "persistent": true,
       "cache": false,
       "dependsOn": [
-        "contracts:deploy:testnet",
         "website:start:testnet",
-        "website:backend"
+        "website:backend:testnet"
       ]
     },
     "install:all": {
@@ -65,15 +63,31 @@
     },
     "website:start": {
       "cache": false,
+      "dependsOn": [
+        "contracts:deploy:solo"
+      ],
       "outputs": ["apps/website/.parcel-cache/**"]
     },
     "website:start:testnet": {
       "cache": false,
+      "dependsOn": [
+        "contracts:deploy:testnet"
+      ],
       "outputs": ["apps/website/.parcel-cache/**"]
     },
     "website:backend": {
       "cache": false,
-      "outputs": ["apps/website/.parcel-cache/**"]
+      "dependsOn": [
+        "contracts:deploy:solo"
+      ],
+      "outputs": ["apps/website/.wrangler/**"]
+    },
+    "website:backend:testnet": {
+      "cache": false,
+      "dependsOn": [
+        "contracts:deploy:testnet"
+      ],
+      "outputs": ["apps/website/.wrangler/**"]
     },
     "clear": {
       "cache": false,
