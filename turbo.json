@@ -48,7 +48,8 @@
       "cache": false
     },
     "website:install": {
-      "cache": false
+      "cache": false,
+      "outputs": ["apps/website/.parcel-cache/**"]
     },
     "contracts:gen:randompk": {
       "cache": false
@@ -63,13 +64,16 @@
       ]
     },
     "website:start": {
-      "cache": false
+      "cache": false,
+      "outputs": ["apps/website/.parcel-cache/**"]
     },
     "website:start:testnet": {
-      "cache": false
+      "cache": false,
+      "outputs": ["apps/website/.parcel-cache/**"]
     },
     "website:backend": {
-      "cache": false
+      "cache": false,
+      "outputs": ["apps/website/.parcel-cache/**"]
     },
     "clear": {
       "cache": false,
@@ -77,7 +81,8 @@
         "data/**",
         "dist/**",
         "website/dist/**",
-        "contracts/deployments/**"
+        "contracts/deployments/**",
+        "apps/website/.parcel-cache/**"
       ],
       "dependsOn": [
         "contracts:solo:down"

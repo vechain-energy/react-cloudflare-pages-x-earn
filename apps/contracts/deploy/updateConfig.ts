@@ -9,7 +9,10 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     const X2EarnApp = (await hre.deployments.get('X2EarnApp')).address
 
     const Addresses = { B3TR, X2EarnRewardsPool, X2EarnApp }
-    const ABI = [...(await hre.deployments.get('X2EarnApp')).abi]
+    const ABI = [
+        ...(await hre.deployments.get('B3TRMock')).abi,
+        ...(await hre.deployments.get('X2EarnApp')).abi
+    ]
 
     const configPath = path.join(__dirname, "..", "..", "..", "dist")
     if (!fs.existsSync(configPath)) { fs.mkdirSync(configPath) }

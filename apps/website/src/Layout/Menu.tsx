@@ -1,15 +1,21 @@
-import { useWallet, WalletButton } from "@vechain/dapp-kit-react";
-import { useWalletName } from "@vechain.energy/dapp-kit-hooks";
+import { useAccount, useReadContract } from 'wagmi'
+import { Addresses, ABI } from '~/config'
+import { WalletAuth } from '~/common/Buttons/WalletAuth'
 
 export default function LayoutMenu() {
-    const { account } = useWallet()
-    const { name } = useWalletName(account)
+    const { address } = useAccount()
 
-    if (account) {
-        return (
-            <WalletButton title={name || account} />
-        )
-    }
+    const balance = useReadContract({
+        abi: ABI,
+        address: Addresses.B3TR as `0x${string}`,
+        functionName: 'balanceOf',
+        args: [address]
+    })
 
-    return <WalletButton />
+    return (
+        <div className='flex items-center justify-end space-x-8'>
+            <span className='text-sm font-mono'>Balance: {String(balance.data ?? 0)}</span>
+            <WalletAuth />
+        </div>
+    )
 }

@@ -1,6 +1,8 @@
+import { NODE_URL, NETWORK, WALLET_CONNECT_PROJECT_ID, APP_TITLE, APP_DESCRIPTION, APP_ICONS, SOLO_BLOCK } from '~/config';
 import { DAppKitProvider } from '@vechain/dapp-kit-react'; // Ensure Genesis is imported
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { NODE_URL, NETWORK, WALLET_CONNECT_PROJECT_ID, APP_TITLE, APP_DESCRIPTION, APP_ICONS, SOLO_BLOCK } from '~/config';
+import { useWagmiConfig } from './hooks/useWagmiConfig';
+import { WagmiProvider } from 'wagmi'
 import { Helmet } from "react-helmet";
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Layout from './Layout';
@@ -24,7 +26,7 @@ const queryClient = new QueryClient()
 
 export default function App() {
     return (
-        <Providers>
+        <VechainProviders>
             <Helmet>
                 <meta charSet="utf-8" />
                 <title>{APP_TITLE}</title>
@@ -37,25 +39,35 @@ export default function App() {
                     </Routes>
                 </Layout>
             </Router>
-        </Providers>
+        </VechainProviders>
     )
 }
 
-function Providers({ children }: { children: React.ReactNode }) {
+function VechainProviders({ children }: { children: React.ReactNode }) {
     const genesis = ['main', 'test'].includes(NETWORK) ? NETWORK as Genesis
         : NETWORK === 'solo' ? SOLO_BLOCK as Genesis
-        : undefined;
+            : undefined;
 
     return (
-        <QueryClientProvider client={queryClient}>
-            <DAppKitProvider
-                nodeUrl={NODE_URL}
-                genesis={genesis}
-                usePersistence={true}
-                walletConnectOptions={walletConnectOptions}
-            >
+        <DAppKitProvider
+            nodeUrl={NODE_URL}
+            genesis={genesis}
+            usePersistence
+            walletConnectOptions={walletConnectOptions}
+        >
+            <AppProviders>{children}</AppProviders>
+        </DAppKitProvider>
+    );
+}
+
+function AppProviders({ children }: { children: React.ReactNode }) {
+    const wagmiConfig = useWagmiConfig()
+
+    return (
+        <WagmiProvider config={wagmiConfig.config}>
+            <QueryClientProvider client={queryClient}>
                 {children}
-            </DAppKitProvider>
-        </QueryClientProvider>
+            </QueryClientProvider>
+        </WagmiProvider>
     );
 }
