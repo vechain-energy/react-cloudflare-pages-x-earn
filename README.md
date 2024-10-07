@@ -33,5 +33,3 @@ You need to:
 - [ ] Streamline environment configuration, to avoid duplication
 - [ ] Simplify turbo configuration
 - [ ] Create a demo deployment
-- [ ] Fix solo signing failing: https://github.com/vechain/vechain-dapp-kit/issues/285
-- [ ] WAGMI Connector needs to access wallet changes without a configuration change: Temp. fix by downgrading wagmi
