@@ -6,8 +6,10 @@ import { useAccount, useConnect, useDisconnect, WagmiProvider } from 'wagmi'
 import { Helmet } from "react-helmet";
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Layout from './Layout';
-import Homepage from './Homepage';
+import { Homepage } from './Homepage';
+import { Profile } from './Profile';
 import { useEffect } from 'react';
+import { ClaimReward } from './ClaimReward';
 
 type Genesis = 'main' | 'test' | Connex.Thor.Block;
 
@@ -36,7 +38,9 @@ export default function App() {
             <Providers>
                 <Layout>
                     <Routes>
-                        <Route path="*" element={<Homepage />} />
+                    <Route path="/me" element={<Profile />} />
+                    <Route path="/claim" element={<ClaimReward />} />
+                    <Route path="*" element={<Homepage />} />
                     </Routes>
                 </Layout>
             </Providers>
