@@ -28,6 +28,7 @@ const namedAccounts = {
   deployer: { default: 0 },
   proxyOwner: { default: 1 },
   owner: { default: 2 },
+  rewarder: { default: 3 }
 };
 
 const config = {

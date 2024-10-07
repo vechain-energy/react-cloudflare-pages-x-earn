@@ -21,6 +21,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     const configData = `
 export const Addresses = ${JSON.stringify(Addresses)}
 export const ABI = ${JSON.stringify(ABI)}
+export const CONTRACTS_NODE_URL = ${JSON.stringify(hre.VeChainProvider?.thorClient.httpClient.baseURL)}
 `
     fs.writeFileSync(configFile, configData)
 };

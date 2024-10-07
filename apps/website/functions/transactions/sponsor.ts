@@ -1,16 +1,9 @@
 import {
-    HttpClient,
-    ThorClient,
-    VeChainProvider,
-    ProviderInternalBaseWallet,
     ProviderInternalHDWallet,
-    signerUtils,
 } from '@vechain/sdk-network';
 import {
-    clauseBuilder,
     secp256k1,
     TransactionHandler,
-    addressUtils,
 } from '@vechain/sdk-core';
 
 export async function onRequestPost({ request, env }): Promise<Response> {
