@@ -22,7 +22,7 @@
     "@vechain/sdk-core": "1.0.0-beta.26",
     "@vechain/sdk-network": "1.0.0-beta.26",
     "@vechain/web3-providers-connex": "^1.1.2",
-    "@wagmi/core": "^2.5.7",
+    "@wagmi/core": "^2.13.8",
     "parcel": "^2.12.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -32,7 +32,7 @@
     "tailwindcss": "^3.4.13",
     "typescript": "^5.6.2",
     "usehooks-ts": "^3.1.0",
-    "wagmi": "^2.5.7"
+    "wagmi": "^2.12.17"
   },
   "devDependencies": {
     "@types/react-helmet": "^6.1.11",

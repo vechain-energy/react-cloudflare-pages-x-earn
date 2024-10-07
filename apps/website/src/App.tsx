@@ -2,11 +2,12 @@ import { NODE_URL, NETWORK, WALLET_CONNECT_PROJECT_ID, APP_TITLE, APP_DESCRIPTIO
 import { DAppKitProvider, useWallet } from '@vechain/dapp-kit-react'; // Ensure Genesis is imported
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { useWagmiConfig } from './hooks/useWagmiConfig';
-import { WagmiProvider } from 'wagmi'
+import { useAccount, useConnect, useDisconnect, WagmiProvider } from 'wagmi'
 import { Helmet } from "react-helmet";
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Layout from './Layout';
 import Homepage from './Homepage';
+import { useEffect } from 'react';
 
 type Genesis = 'main' | 'test' | Connex.Thor.Block;
 
@@ -62,15 +63,38 @@ function Providers({ children }: { children: React.ReactNode }) {
 
 function DAppKitConsumers({ children }: { children: React.ReactNode }) {
     const { config } = useWagmiConfig()
-    const wallet = useWallet()
 
     return (
         <Router>
-            <WagmiProvider config={config} reconnectOnMount={wallet.account ? true : false}>
+            <WagmiProvider config={config} reconnectOnMount={false}>
                 <QueryClientProvider client={queryClient}>
-                    {children}
+                    <WagmiAutoConnector>
+                        {children}
+                    </WagmiAutoConnector>
                 </QueryClientProvider>
             </WagmiProvider>
         </Router>
     );
+}
+
+function WagmiAutoConnector({ children }: { children: React.ReactNode }) {
+    const { account } = useWallet()
+    const { isConnected } = useAccount()
+    const { connect } = useConnect()
+    const { disconnect } = useDisconnect()
+    const { config } = useWagmiConfig()
+
+    useEffect(() => {
+        if (!isConnected && account) {
+            connect({ connector: config.connectors[0] })
+        }
+    }, [isConnected, account, connect])
+
+    useEffect(() => {
+        if (isConnected && !account) {
+            disconnect({ connector: config.connectors[0] })
+        }
+    }, [isConnected, account, disconnect])
+
+    return children
 }

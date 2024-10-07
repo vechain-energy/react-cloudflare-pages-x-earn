@@ -22,7 +22,7 @@ export async function onRequestPost({ request, env }): Promise<Response> {
     );
     console.log('Transaction', transactionToSign);
 
-    const signerWallet = new ProviderInternalHDWallet(env.SIGNER_MNEMONIC.split(' '))
+    const signerWallet = new ProviderInternalHDWallet((env.SIGNER_MNEMONIC).split(' '))
     const signer = await signerWallet.getAccount(0)
 
     const delegatedHash = transactionToSign.getSignatureHash(body.origin);

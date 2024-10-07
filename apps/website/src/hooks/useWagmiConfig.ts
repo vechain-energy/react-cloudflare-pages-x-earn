@@ -17,7 +17,7 @@ const vechainNetwork = VechainNetworkMap[NETWORK] ?? mainnet
 export function useWagmiConfig() {
     const connex = useConnex()
     const connectModal = useWalletModal()
-    const wallet = useWallet()
+    const { connect, account, disconnect } = useWallet()
 
     const config = useMemo(() => {
         // create the provider
@@ -34,9 +34,10 @@ export function useWagmiConfig() {
             name: vechainNetwork.name,
             type: 'wallet',
             connect: async () => {
-                if (!wallet.account) {
+                console.log("account", account)
+                if (!account) {
                     await connectModal.open()
-                    const result = await wallet.connect()
+                    const result = await connect()
                     return {
                         accounts: [result.account as `0x${string}`],
                         chainId: vechainNetwork.id,
@@ -44,11 +45,11 @@ export function useWagmiConfig() {
                 }
 
                 return {
-                    accounts: [wallet.account as `0x${string}`],
+                    accounts: [account as `0x${string}`],
                     chainId: vechainNetwork.id
                 }
             },
-            disconnect: async () => await wallet.disconnect(),
+            disconnect: async () => await disconnect(),
             getProvider: async () => {
                 return {
                     ...provider,
@@ -56,8 +57,8 @@ export function useWagmiConfig() {
                 }
             },
             getChainId: async () => vechainNetwork.id,
-            getAccounts: async () => wallet.account ? [wallet.account as `0x${string}`] : [],
-            isAuthorized: async () => Boolean(wallet.account),
+            getAccounts: async () => account ? [account as `0x${string}`] : [],
+            isAuthorized: async () => Boolean(account),
             onAccountsChanged: () => { },
             onChainChanged: () => { },
             onDisconnect: () => { },
@@ -72,7 +73,7 @@ export function useWagmiConfig() {
                 [vechainNetwork.id]: provider
             }
         })
-    }, [connex, wallet, connectModal]);
+    }, [connex, account, connect, disconnect, connectModal]);
 
     return {
         config
