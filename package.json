@@ -6,7 +6,6 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "contracts:install": "cd apps/contracts; npm install --legacy-peer-deps",
-    "contracts:gen:randompk": "echo \"PRIVATE_KEY=0x$(openssl rand -hex 32)\" > ./apps/contracts/.env",
     "website:install": "npm install --prefix apps/website",
 
     "contracts:build": "npm run build --prefix apps/contracts",
@@ -22,9 +21,11 @@
 
     "dev:testnet": "npm run contracts:deploy:testnet && npm run website:start",
 
-    "postinstall": "turbo install:all",
+    "postinstall": "turbo install:all; touch apps/contracts/.env",
     "contracts:solo:up": "npm run solo:up --prefix apps/contracts",
-    "contracts:solo:down": "npm run solo:down --prefix apps/contracts"
+    "contracts:solo:down": "npm run solo:down --prefix apps/contracts",
+
+    "dev": "ENV_FILE=`pwd`/.env.local turbo dev"
   },
   "keywords": [],
   "author": "",

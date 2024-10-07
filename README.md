@@ -8,7 +8,7 @@ npm install
 # Dev
 
 ```shell
-turbo dev
+npm run dev
 ```
 
 This will:

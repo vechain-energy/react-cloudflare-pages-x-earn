@@ -1,5 +1,10 @@
 {
   "$schema": "https://turbo.build/schema.json",
+  "globalPassThroughEnv": ["MNEMONIC", "NODE_ENV", "ENV_FILE"],
+  "globalDependencies": [
+    ".env",
+    ".env.local"
+  ],
   "tasks": {
     "build": {
       "dependsOn": [
@@ -23,7 +28,12 @@
       "dependsOn": [
         "website:start",
         "website:backend"
-      ]
+      ],
+      "inputs": [
+        ".env.local",
+        ".env.testnet",
+        ".env"
+      ]      
     },
     "testnet": {
       "persistent": true,
@@ -31,6 +41,11 @@
       "dependsOn": [
         "website:start:testnet",
         "website:backend:testnet"
+      ],
+      "inputs": [
+        ".env.local",
+        ".env.testnet",
+        ".env"
       ]
     },
     "install:all": {
@@ -38,8 +53,7 @@
       "outputs": [],
       "dependsOn": [
         "contracts:install",
-        "website:install",
-        "contracts:gen:randompk"
+        "website:install"
       ]
     },
     "contracts:install": {
@@ -47,18 +61,29 @@
     },
     "website:install": {
       "cache": false,
-      "outputs": ["apps/website/.parcel-cache/**"]
-    },
-    "contracts:gen:randompk": {
-      "cache": false
+      "outputs": [
+        "apps/website/.parcel-cache/**"
+      ]
     },
     "contracts:solo:up": {
-      "cache": false
+      "cache": false,
+      "outputs": [
+        "data/thor/**"
+      ]
     },
     "contracts:deploy:solo": {
       "cache": false,
       "dependsOn": [
         "contracts:solo:up"
+      ],
+      "outputs": [
+        "contracts/deployments/vechain_solo"
+      ]
+    },
+    "contracts:deploy:testnet": {
+      "cache": false,
+      "outputs": [
+        "contracts/deployments/vechain_testnet"
       ]
     },
     "website:start": {
@@ -66,28 +91,41 @@
       "dependsOn": [
         "contracts:deploy:solo"
       ],
-      "outputs": ["apps/website/.parcel-cache/**"]
+      "outputs": [
+        "apps/website/.parcel-cache/**"
+      ]
     },
     "website:start:testnet": {
       "cache": false,
       "dependsOn": [
         "contracts:deploy:testnet"
       ],
-      "outputs": ["apps/website/.parcel-cache/**"]
+      "outputs": [
+        "apps/website/.parcel-cache/**"
+      ]
     },
     "website:backend": {
       "cache": false,
       "dependsOn": [
         "contracts:deploy:solo"
       ],
-      "outputs": ["apps/website/.wrangler/**"]
+      "outputs": [
+        "apps/website/.wrangler/**"
+      ]
     },
     "website:backend:testnet": {
       "cache": false,
       "dependsOn": [
         "contracts:deploy:testnet"
       ],
-      "outputs": ["apps/website/.wrangler/**"]
+      "outputs": [
+        "apps/website/.wrangler/**"
+      ],
+      "env": [
+        "ENV_FILE",
+        "NODE_ENV",
+        "MNEMONIC"
+      ]
     },
     "clear": {
       "cache": false,

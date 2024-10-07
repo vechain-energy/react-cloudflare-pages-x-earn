@@ -4,17 +4,23 @@ import '@vechain/sdk-hardhat-plugin';
 import '@openzeppelin/hardhat-upgrades';
 import 'hardhat-deploy';
 import 'hardhat-deploy-ethers';
-import 'dotenv/config';
+import * as dotenv from 'dotenv';
+dotenv.config({
+  path: process.env.ENV_FILE
+})
 
-if (!process.env.PRIVATE_KEY) {
-  throw new Error('Please set your PRIVATE_KEY in a .env file or in your environment variables');
+if (!process.env.MNEMONIC) {
+  throw new Error('Please set your MNEMONIC in a .env file or in your environment variables');
 }
 
-const accounts = [
-  process.env.PRIVATE_KEY, // deployer
-  process.env.DEPLOYER_PRIVATE_KEY ?? process.env.PRIVATE_KEY, // proxyOwner
-  process.env.OWNER_PRIVATE_KEY ?? process.env.PRIVATE_KEY, // owner
-];
+const accounts = {
+  mnemonic: process.env.MNEMONIC,
+  path: "m/44'/60'/0'/0",
+  initialIndex: 0,
+  count: 20,
+  passphrase: "",
+}
+
 
 // see https://github.com/wighawag/hardhat-deploy?tab=readme-ov-file#1-namedaccounts-ability-to-name-addresses
 // references the index from the accounts list above, can be configured by network too
