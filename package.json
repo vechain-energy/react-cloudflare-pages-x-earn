@@ -19,13 +19,13 @@
     "website:start:testnet": "NODE_ENV=testnet npm run start --prefix apps/website",
     "website:backend": "npm run dev:pages --prefix apps/website",
 
-    "dev:testnet": "npm run contracts:deploy:testnet && npm run website:start",
+    "dev": "NODE_ENV=local ENV_FILE=`pwd`/.env.local turbo dev",
+    "dev:testnet": "ENV_FILE=`pwd`/.env.testnet npm run contracts:deploy:testnet && NODE_ENV=testnet npm run website:start",
 
     "postinstall": "turbo install:all; touch apps/contracts/.env",
     "contracts:solo:up": "npm run solo:up --prefix apps/contracts",
-    "contracts:solo:down": "npm run solo:down --prefix apps/contracts",
+    "contracts:solo:down": "npm run solo:down --prefix apps/contracts"
 
-    "dev": "ENV_FILE=`pwd`/.env.local turbo dev"
   },
   "keywords": [],
   "author": "",
