@@ -1,33 +1,23 @@
-import {
-    ProviderInternalHDWallet,
-} from '@vechain/sdk-network';
-import {
-    secp256k1,
-    TransactionHandler,
-} from '@vechain/sdk-core';
+import { Address, HDKey, Transaction, Secp256k1, Hex } from '@vechain/sdk-core';
 
 export async function onRequestPost({ request, env }): Promise<Response> {
     const body = await request.json()
     console.log('Incoming request', body);
 
-    const transactionToSign = TransactionHandler.decode(
-        Buffer.from(body.raw.slice(2), 'hex')
+    const signerWallet = HDKey.fromMnemonic((env.SIGNER_MNEMONIC).split(' '), HDKey.VET_DERIVATION_PATH).deriveChild(0);
+    if (!signerWallet.publicKey || !signerWallet.privateKey) { throw new Error('Could not load signing wallet') }
+
+    const signerAddress = Address.ofPublicKey(signerWallet.publicKey)
+    const transactionToSign = Transaction.decode(
+        Buffer.from(body.raw.slice(2), 'hex'),
+        false
     );
-    console.log('Transaction', transactionToSign);
-
-    const signerWallet = new ProviderInternalHDWallet((env.SIGNER_MNEMONIC).split(' '))
-    const signer = await signerWallet.getAccount(0)
-
-    const delegatedHash = transactionToSign.getSignatureHash(body.origin);
-    const signature = `0x${Buffer.from(
-        secp256k1.sign(delegatedHash, signer.privateKey)
-    ).toString('hex')}`;
-
-    console.log('Signature', signature);
+    const transactionHash = transactionToSign.getSignatureHash(Address.of(body.origin))
+    const signature = Secp256k1.sign(transactionHash.bytes, signerWallet.privateKey)
 
     return new Response(JSON.stringify({
-        signature,
-        address: signer?.address
+        signature: Hex.of(signature).toString(),
+        address: signerAddress.toString()
     }), {
         status: 200,
         headers: {
