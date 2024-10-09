@@ -35,7 +35,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     const x2EarnApp = await hre.ethers.getContract('X2EarnApp', deployer) as X2EarnApp
     const rewarderRoleId = await x2EarnApp.REWARDER_ROLE()
     if (!(await x2EarnApp.hasRole(rewarderRoleId, rewarder))) {
-        console.log('Granting rewarder Permissions');
+        console.log(`Granting rewarder (${rewarder}) Permissions`);
         await x2EarnApp.grantRole(rewarderRoleId, rewarder)
     }
 };

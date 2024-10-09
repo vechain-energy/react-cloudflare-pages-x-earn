@@ -14,8 +14,8 @@ if (!process.env.MNEMONIC) {
 }
 
 const accounts = {
-  mnemonic: process.env.MNEMONIC,
-  path: "m/44'/60'/0'/0",
+  mnemonic: process.env.MNEMONIC ?? 'denial kitchen pet squirrel other broom bar gas better priority spoil cross',
+  path: "m/44'/818'/0'/0",
   initialIndex: 0,
   count: 20,
   passphrase: "",
@@ -41,11 +41,7 @@ const config = {
     },
     vechain_solo: {
       url: "http://localhost:8669",
-      accounts: {
-        mnemonic: 'denial kitchen pet squirrel other broom bar gas better priority spoil cross',
-        count: 10,
-        path: "m/44'/818'/0'/0",
-      },
+      accounts,
       restful: true,
       gas: 'auto',
       gasPrice: 'auto',

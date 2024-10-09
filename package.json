@@ -18,10 +18,11 @@
     "website:start": "npm run start --prefix apps/website",
     "website:start:testnet": "NODE_ENV=testnet npm run start --prefix apps/website",
     "website:backend": "npm run dev:pages --prefix apps/website",
+    "website:backend:testnet": "npm run dev:pages --prefix apps/website",
 
     "start": "npm run dev",
     "dev": "NODE_ENV=local ENV_FILE=`pwd`/.env.local turbo dev",
-    "dev:testnet": "ENV_FILE=`pwd`/.env.testnet npm run contracts:deploy:testnet && NODE_ENV=testnet npm run website:start",
+    "testnet": "ENV_FILE=`pwd`/.env.testnet turbo testnet",
 
     "postinstall": "turbo install:all; touch apps/contracts/.env",
     "contracts:solo:up": "npm run solo:up --prefix apps/contracts",
