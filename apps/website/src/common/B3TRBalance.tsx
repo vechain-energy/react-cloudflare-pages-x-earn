@@ -39,7 +39,7 @@ export function B3TRBalance({ address }: { address?: `0x${string}` }) {
     if (address && balance.isSuccess && balance.data.length === 3) {
         return (
             <span>
-                {formatUnits(balance.data[0].result as bigint, Number(balance.data[1].result))}
+                {formatUnits(BigInt(String(balance.data[0].result)), Number(balance.data[1].result))}
                 {' '}
                 {String(balance.data[2].result)}
             </span>
