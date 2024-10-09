@@ -1,4 +1,12 @@
-export * from '~/../../../dist/config.ts'
+import * as TestNetwork from '~/../../../dist/test/config.ts'
+import * as MainNetwork from '~/../../../dist/main/config.ts'
+import * as SoloNetwork from '~/../../../dist/solo/config.ts'
+
+export const Networks = {
+    test: TestNetwork,
+    main: MainNetwork,
+    solo: SoloNetwork
+}
 
 // obtain on https://cloud.walletconnect.com/
 // must be set to enable VeWorld mobile connections on Desktop
@@ -7,6 +15,10 @@ export const WALLET_CONNECT_PROJECT_ID = process.env.WALLET_CONNECT_PROJECT_ID ?
 // the network to use, based on the node to connect to
 export const NODE_URL = process.env.NODE_URL ?? `https://testnet.vechain.org`;
 export const NETWORK = process.env.NETWORK ?? "test";
+
+export const Addresses = Networks[NETWORK]?.Addresses
+export const ABI = Networks[NETWORK]?.ABI
+export const CONTRACTS_NODE_URL = Networks[NETWORK]?.CONTRACTS_NODE_URL
 
 export const SOLO_BLOCK = {
     "number": 0,

@@ -33,3 +33,12 @@ You need to:
 - [ ] Streamline environment configuration, to avoid duplication
 - [ ] Simplify turbo configuration
 - [ ] Create a demo deployment
+
+# Deployments
+
+## CloudFlare Pages
+
+* Root dir: `apps/website`
+* Build command: `npm run build`
+* Output dir: `dist`
+* Environment variables must be **encrypted** ([See Bug-Report on CloudFlare](https://community.cloudflare.com/t/env-vars-from-dashboard-not-loading-in-cloudflare-pages-site-with-wrangler-toml/702808/12))
