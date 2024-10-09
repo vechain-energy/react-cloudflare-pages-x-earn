@@ -5,5 +5,5 @@ compatibility_flags = ["nodejs_compat_v2"]
 
 [vars]
 MNEMONIC = "denial kitchen pet squirrel other broom bar gas better priority spoil cross"
-REWARDER_MNEMONIC_CHILD=3
+REWARDER_MNEMONIC_CHILD = 3
 SIGNER_MNEMONIC = "denial kitchen pet squirrel other broom bar gas better priority spoil cross"
