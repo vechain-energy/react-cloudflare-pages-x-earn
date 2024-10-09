@@ -29,7 +29,7 @@ export async function onRequestPost({ request, env }): Promise<Response> {
 
         const thor = ThorClient.fromUrl(CONTRACTS_NODE_URL)
         const signerWallet = new ProviderInternalHDWallet((env.MNEMONIC).split(' '), Number(env.REWARDER_MNEMONIC_CHILD) + 1)
-        const signerAccount = await signerWallet.getAccount(env.REWARDER_MNEMONIC_CHILD ?? 0)
+        const signerAccount = await signerWallet.getAccount(Number(env.REWARDER_MNEMONIC_CHILD ?? 0))
         const provider = new VeChainProvider(
             thor,
             new ProviderInternalBaseWallet([signerAccount]),
