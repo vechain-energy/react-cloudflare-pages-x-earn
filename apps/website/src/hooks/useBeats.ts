@@ -1,8 +1,13 @@
 import React from 'react';
-import { subscriptions } from '@vechain/sdk-network';
-// import { bloomUtils, addressUtils } from '@vechain/sdk-core';
+// fails:
+// TypeError: Class extends value undefined is not a constructor or null
+// ..
+// > 4140 | var JSONRPCEthersProvider = class extends vechain_sdk_core_ethers3.JsonRpcApiProvider {
+// … skipping to 
+// import { subscriptions } from '@vechain/sdk-network';
 import useWebSocket from 'react-use-websocket';
 import { NODE_URL } from '~/config';
+import { BloomFilter, Hex, Address } from "@vechain/sdk-core";
 
 type Beat = {
   number: number;
@@ -30,32 +35,36 @@ const DELAY = 100;
  */
 const useBeats = (addressesOrData: (string | `0x${string}` | null | undefined)[]) => {
   const [block, setBlock] = React.useState<Beat | null>(null);
-  // const { lastJsonMessage } = useWebSocket(
-  //   subscriptions.getBeatSubscriptionUrl(NODE_URL),
-  //   {
-  //     share: true,
-  //     shouldReconnect: () => true,
-  //   }
-  // );
+  const { lastJsonMessage } = useWebSocket(
+    `${NODE_URL}/subscriptions/beat2`.replace('http', 'ws'),
+    // subscriptions.getBeatSubscriptionUrl(NODE_URL),
+    {
+      share: true,
+      shouldReconnect: () => true,
+    }
+  );
 
-  // React.useEffect(() => {
-  //   try {
-  //     const block = lastJsonMessage as Beat;
-  //     if (
-  //       (addressesOrData
-  //         .filter(value => Boolean(value)) as string[])
-  //         .some((addressOrData: string) =>
-  //           addressUtils.isAddress(addressOrData)
-  //             ? bloomUtils.isAddressInBloom(block.bloom, block.k, addressOrData)
-  //             : bloomUtils.isInBloom(block.bloom, block.k, addressOrData)
-  //         )
-  //     ) {
-  //       setTimeout(() => setBlock(block), DELAY);
-  //     }
-  //   } catch {
-  //     /* ignore */
-  //   }
-  // }, [lastJsonMessage]);
+  React.useEffect(() => {
+    try {
+      const block = lastJsonMessage as Beat | null;
+      if (!block) { return }
+
+      const filter = new BloomFilter(Hex.of(block.bloom).bytes, block.k)
+
+      if (
+        (addressesOrData
+          .filter(value => Boolean(value)) as string[])
+          .some((addressOrData: string) =>
+            filter.contains(Hex.of(addressOrData))
+          )
+      ) {
+        console.log('FOUND', addressesOrData, block)
+        setTimeout(() => setBlock(block), DELAY);
+      }
+    } catch {
+      /* ignore */
+    }
+  }, [lastJsonMessage]);
 
   return block;
 };
