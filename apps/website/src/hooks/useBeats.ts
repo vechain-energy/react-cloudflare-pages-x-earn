@@ -58,7 +58,6 @@ const useBeats = (addressesOrData: (string | `0x${string}` | null | undefined)[]
             filter.contains(Hex.of(addressOrData))
           )
       ) {
-        console.log('FOUND', addressesOrData, block)
         setTimeout(() => setBlock(block), DELAY);
       }
     } catch {
