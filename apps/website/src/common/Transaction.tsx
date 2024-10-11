@@ -17,7 +17,7 @@ export default function TransactionStatus({ txId }: { txId: string }) {
         placeholderData: (previousData) => previousData,
         enabled: Boolean(txId) && !hasReceipt
     })
-    const txChange = useBeats([txId], NODE_URL)
+    const txChange = useBeats([txId])
 
     React.useEffect(() => {
         if (receipt.data) { setHasReceipt(true) }
