@@ -37,7 +37,7 @@ export function ConnectWebApp() {
                             {connectedServices.includes(provider.id) ? (
                                 <span>Connected</span>
                             ) : (
-                                <a href={`${BACKEND_URL}/connect/oauth/${provider.id}?user_id=${encodeURIComponent(String(address))}`}>Connect</a>
+                                <a href={`${BACKEND_URL}/connect/oauth/${provider.id}?user_id=${encodeURIComponent(String(address))}&redirect_uri=${encodeURIComponent(window.location.href)}`}>Connect</a>
                             )}
                         </dd>
                     </Fragment>

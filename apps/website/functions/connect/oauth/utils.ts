@@ -40,6 +40,7 @@ export async function ensureTablesExist(db) {
                             state TEXT PRIMARY KEY,
                             user_id TEXT NOT NULL UNIQUE,
                             service_id TEXT NOT NULL,
+                            redirect_uri TEXT NOT NULL,
                             expires_at DATETIME NOT NULL,
                             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                             FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE

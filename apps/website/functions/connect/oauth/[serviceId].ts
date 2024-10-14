@@ -8,6 +8,7 @@ export async function onRequestGet({ request, env, params }): Promise<Response> 
 
     // @TODO: move this into a session signed storage
     const userId = (url.searchParams.get('user_id') ?? '').toLowerCase();
+    const userRedirectUri = (url.searchParams.get('redirect_uri') ?? '').toLowerCase();
 
     if (!userId) {
         return new Response('Error: user_id is required', {
@@ -38,8 +39,8 @@ export async function onRequestGet({ request, env, params }): Promise<Response> 
             if (!env.WITHINGS_CLIENT_ID || !env.WITHINGS_SECRET) { return new Response('Error: Withings app not configured', { status: 500, headers: { 'Content-Type': 'text/plain' } }); }
 
             const authorizationUrl = `https://account.withings.com/oauth2_user/authorize2?response_type=code&client_id=${env.WITHINGS_CLIENT_ID}&scope=user.info,user.metrics,user.activity&redirect_uri=${redirectUri}&state=${state}`;
-            const { results } = await env.DB.prepare("INSERT OR REPLACE INTO oauth_states (state, user_id, service_id, expires_at) VALUES (?, ?, ?, datetime('now', '+1 hour'))")
-                .bind(state, userId, params.serviceId)
+            const { results } = await env.DB.prepare("INSERT OR REPLACE INTO oauth_states (state, user_id, service_id, redirect_uri, expires_at) VALUES (?, ?, ?, ?, datetime('now', '+1 hour'))")
+                .bind(state, userId, params.serviceId, userRedirectUri)
                 .run();
 
             if (!results) { return new Response('Error: Failed to store OAuth state', { status: 500, headers: { 'Content-Type': 'text/plain' } }); }

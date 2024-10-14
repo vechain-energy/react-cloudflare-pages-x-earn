@@ -45,47 +45,55 @@ export async function onRequestGet({ request, env }): Promise<Response> {
 
             if (!insertResults) { return new Response('Error: Failed to store OAuth session', { status: 500, headers: { 'Content-Type': 'text/plain' } }); }
 
-            // Fetch activity data for the last day
-            const today = new Date();
-            const yesterday = new Date(today);
-            yesterday.setDate(yesterday.getDate() - 1);
-
-            const startDate = yesterday.toISOString().split('T')[0];
-            const endDate = today.toISOString().split('T')[0];
-
-            const activityResponse = await fetch('https://wbsapi.withings.net/v2/measure', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'Authorization': `Bearer ${tokenData.body.access_token}`
-                },
-                body: new URLSearchParams({
-                    action: 'getactivity',
-                    startdateymd: startDate,
-                    enddateymd: endDate
-                })
-            });
-
-            const activityData = await activityResponse.json();
-
-            if (activityData.status !== 0) {
-                console.error('Failed to fetch activity data:', activityData);
+            // Redirect to the stored redirect URI
+            const redirectUri = results[0].redirect_uri;
+            if (redirectUri) {
+                return Response.redirect(redirectUri, 302);
+            } else {
+                return new Response('Redirect URI not found', { status: 400 });
             }
 
-            const responseData = {
-                serviceUserId,
-                activityData,
-                accessToken: tokenData.body.access_token,
-                refreshToken: tokenData.body.refresh_token,
-                expiresIn: tokenData.body.expires_in
-            };
+        // // Fetch activity data for the last day
+        // const today = new Date();
+        // const yesterday = new Date(today);
+        // yesterday.setDate(yesterday.getDate() - 1);
 
-            return new Response(JSON.stringify(responseData), {
-                status: 200,
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
+        // const startDate = yesterday.toISOString().split('T')[0];
+        // const endDate = today.toISOString().split('T')[0];
+
+        // const activityResponse = await fetch('https://wbsapi.withings.net/v2/measure', {
+        //     method: 'POST',
+        //     headers: {
+        //         'Content-Type': 'application/x-www-form-urlencoded',
+        //         'Authorization': `Bearer ${tokenData.body.access_token}`
+        //     },
+        //     body: new URLSearchParams({
+        //         action: 'getactivity',
+        //         startdateymd: startDate,
+        //         enddateymd: endDate
+        //     })
+        // });
+
+        // const activityData = await activityResponse.json();
+
+        // if (activityData.status !== 0) {
+        //     console.error('Failed to fetch activity data:', activityData);
+        // }
+
+        // const responseData = {
+        //     serviceUserId,
+        //     activityData,
+        //     accessToken: tokenData.body.access_token,
+        //     refreshToken: tokenData.body.refresh_token,
+        //     expiresIn: tokenData.body.expires_in
+        // };
+
+        // return new Response(JSON.stringify(responseData), {
+        //     status: 200,
+        //     headers: {
+        //         'Content-Type': 'application/json'
+        //     }
+        // });
 
         default:
             return new Response(`Error: App ID '${serviceId}' not found`, {
