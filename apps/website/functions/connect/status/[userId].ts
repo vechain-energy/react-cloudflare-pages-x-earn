@@ -1,5 +1,5 @@
 export const onRequestGet = async ({ params, env }) => {
-    const userId = params.userId;
+    const userId = params.userId.toLowerCase();
 
     if (!userId) { return new Response('User ID is required', { status: 400 }); }
 
