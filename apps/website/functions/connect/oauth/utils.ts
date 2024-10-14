@@ -15,7 +15,7 @@ export async function ensureTablesExist(db) {
                             id TEXT PRIMARY KEY,
                             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                             updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-                        )
+                        );
                     `);
                     break;
                 case 'oauth_sessions':
@@ -30,7 +30,7 @@ export async function ensureTablesExist(db) {
                             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                             updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                             FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-                        )
+                        );
                     `);
                     break;
                 case 'oauth_states':
@@ -42,7 +42,7 @@ export async function ensureTablesExist(db) {
                             expires_at DATETIME NOT NULL,
                             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                             FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-                        )
+                        );
                     `);
                     break;
             }

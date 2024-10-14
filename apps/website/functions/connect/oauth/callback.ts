@@ -10,8 +10,6 @@ export async function onRequestGet({ request, env }): Promise<Response> {
         return new Response('Authorization code not found', { status: 400 });
     }
 
-    await ensureTablesExist(env.DB)
-
     // Verify state and expiration
     const { results } = await env.DB.prepare(
         "SELECT * FROM oauth_states WHERE state = ? AND expires_at > datetime('now') AND service_id = ?"
