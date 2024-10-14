@@ -55,7 +55,7 @@ export async function onRequestGet({ request, env }): Promise<Response> {
 
             // Store user and session information in oauth_sessions
             const { results: insertResults } = await env.DB.prepare(
-                "INSERT OR REPLACE INTO oauth_sessions (state, user_id, service_user_id, access_token, refresh_token, expires_at) VALUES (?, ?, ?, ?, datetime('now', '+' || ? || ' seconds'))"
+                "INSERT OR REPLACE INTO oauth_sessions (state, user_id, service_user_id, access_token, refresh_token, expires_at) VALUES (?, ?, ?, ?, ?, datetime('now', '+' || ? || ' seconds'))"
             )
                 .bind(state, '0x', serviceUserId, tokenData.body.access_token, tokenData.body.refresh_token, tokenData.body.expires_in)
                 .run();
