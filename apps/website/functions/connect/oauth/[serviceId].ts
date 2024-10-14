@@ -1,6 +1,9 @@
+import { ensureTablesExist } from "./utils";
+
 export async function onRequestGet({ request, env, params }): Promise<Response> {
     const redirectUri = encodeURIComponent(`https://${request.headers.get('host')}/connect/oauth/callback`);
     const state = `${params.serviceId}:${Math.random().toString(36).substring(7)}`;
+    await ensureTablesExist(env.DB)
 
     switch (params.serviceId) {
         case 'withings':
