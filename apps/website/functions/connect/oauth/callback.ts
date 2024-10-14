@@ -4,13 +4,32 @@ export async function onRequestGet({ request, env }): Promise<Response> {
     const url = new URL(request.url);
     const code = url.searchParams.get('code') ?? '';
     const state = url.searchParams.get('state') ?? '';
-    const appId = state.split(':')[0]
+    const serviceId = state.split(':')[0]
 
     if (!code) {
         return new Response('Authorization code not found', { status: 400 });
     }
 
-    switch (appId) {
+    // Verify state and expiration
+    const { results } = await env.DB.prepare(
+        "SELECT * FROM oauth_states WHERE state = ? AND expires_at > datetime('now') AND service_id = ?"
+    )
+    .bind(state, serviceId)
+    .all();
+
+    if (!results || results.length === 0) {
+        return new Response('Invalid or expired state', { status: 400 });
+    }
+
+    // State is valid, clean up the used state
+    await env.DB.prepare(
+        "DELETE FROM oauth_states WHERE state = ?"
+    )
+    .bind(state)
+    .run();
+
+    
+    switch (serviceId) {
         case 'withings':
             // Exchange the code for an access token
             const tokenResponse = await fetch('https://wbsapi.withings.net/v2/oauth2', {
@@ -34,18 +53,19 @@ export async function onRequestGet({ request, env }): Promise<Response> {
 
             const userId = `withings://${tokenData.body.userid}`
 
-            // Fetch user profile
-            const profileResponse = await fetch('https://wbsapi.withings.net/v2/user', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'Authorization': `Bearer ${tokenData.body.access_token}`
-                },
-                body: new URLSearchParams({
-                    action: "get"
+            // Store user and session information in oauth_sessions
+            const { results: insertResults } = await env.DB.prepare(
+                "INSERT OR REPLACE INTO oauth_sessions (state, user_id, access_token, refresh_token, expires_at) VALUES (?, ?, ?, ?, datetime('now', '+' || ? || ' seconds'))"
+            )
+            .bind(state, userId, tokenData.body.access_token, tokenData.body.refresh_token, tokenData.body.expires_in)
+            .run();
 
-                })
-            });
+            if (!insertResults) {
+                return new Response('Error: Failed to store OAuth session', {
+                    status: 500,
+                    headers: { 'Content-Type': 'text/plain' }
+                });
+            }
 
             // Fetch activity data for the last day
             const today = new Date();

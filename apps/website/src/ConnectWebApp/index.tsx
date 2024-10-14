@@ -1,7 +1,6 @@
 import { Fragment } from 'react';
 import { BACKEND_URL } from '~/config';
 import { useAccount } from 'wagmi'
-import { Link } from 'react-router-dom'
 
 const WebProviders = [
     {
@@ -26,7 +25,7 @@ export function ConnectWebApp() {
                     <Fragment key={provider.id}>
                         <dt className="font-medium text-sm">{provider.title}:</dt>
                         <dd className='font-mono text-xs text-right'>
-                            <Link to={`${BACKEND_URL}/connect/oauth/${provider.id}`}>Connect</Link>
+                            <a href={`${BACKEND_URL}/connect/oauth/${provider.id}`}>Connect</a>
                         </dd>
                     </Fragment>
                 ))}

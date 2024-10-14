@@ -7,3 +7,10 @@ compatibility_flags = ["nodejs_compat_v2"]
 MNEMONIC = "denial kitchen pet squirrel other broom bar gas better priority spoil cross"
 REWARDER_MNEMONIC_CHILD = "3"
 SIGNER_MNEMONIC = "denial kitchen pet squirrel other broom bar gas better priority spoil cross"
+# WITHINGS_CLIENT_ID = ""
+# WITHINGS_SECRET = ""
+
+[[d1_databases]]
+binding = "DB"
+database_name = "db"
+database_id = "cabd289f-ddb3-4a6c-939d-6bc761744b06"
