@@ -15,7 +15,7 @@ export async function onRequestGet({ request, env, params }): Promise<Response> 
             const { results } = await env.DB.prepare(
                 "INSERT INTO oauth_states (state, user_id, service_id, expires_at) VALUES (?, ?, ?, datetime('now', '+1 hour'))"
             )
-            .bind(state, '0x', params.appId)
+            .bind(state, '0x', params.serviceId)
             .run();
 
             if (!results) {
