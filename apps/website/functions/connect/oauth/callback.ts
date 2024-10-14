@@ -6,25 +6,14 @@ export async function onRequestGet({ request, env }): Promise<Response> {
     const state = url.searchParams.get('state') ?? '';
     const serviceId = state.split(':')[0]
 
-    if (!code) {
-        return new Response('Authorization code not found', { status: 400 });
-    }
+    if (!code) { return new Response('Authorization code not found', { status: 400 }); }
 
-    // Verify state and expiration
-    const { results } = await env.DB.prepare(
-        "SELECT * FROM oauth_states WHERE state = ? AND expires_at > datetime('now') AND service_id = ?"
-    )
+    const { results } = await env.DB.prepare("SELECT * FROM oauth_states WHERE state = ? AND expires_at > datetime('now') AND service_id = ?")
         .bind(state, serviceId)
         .all();
 
-    if (!results || results.length === 0) {
-        return new Response('Invalid or expired state', { status: 400 });
-    }
-
-    // State is valid, clean up the used state
-    await env.DB.prepare(
-        "DELETE FROM oauth_states WHERE state = ?"
-    )
+    if (!results || results.length === 0) { return new Response('Invalid or expired state', { status: 400 }); }
+    await env.DB.prepare("DELETE FROM oauth_states WHERE state = ?")
         .bind(state)
         .run();
 
@@ -47,25 +36,14 @@ export async function onRequestGet({ request, env }): Promise<Response> {
 
             const tokenData = await tokenResponse.json();
 
-            if (!tokenData.body.access_token) {
-                return new Response('Failed to obtain access token', { status: 500 });
-            }
+            if (!tokenData.body.access_token) { return new Response('Failed to obtain access token', { status: 500 }); }
 
             const serviceUserId = `withings://${tokenData.body.userid}`
-
-            // Store user and session information in oauth_sessions
-            const { results: insertResults } = await env.DB.prepare(
-                "INSERT OR REPLACE INTO oauth_sessions (state, user_id, service_user_id, access_token, refresh_token, expires_at) VALUES (?, ?, ?, ?, ?, datetime('now', '+' || ? || ' seconds'))"
-            )
-                .bind(state, '0x', serviceUserId, tokenData.body.access_token, tokenData.body.refresh_token, tokenData.body.expires_in)
+            const { results: insertResults } = await env.DB.prepare("INSERT OR REPLACE INTO oauth_sessions (state, user_id, service_user_id, access_token, refresh_token, expires_at) VALUES (?, ?, ?, ?, ?, datetime('now', '+' || ? || ' seconds'))")
+                .bind(state, results[0].user_id, serviceUserId, tokenData.body.access_token, tokenData.body.refresh_token, tokenData.body.expires_in)
                 .run();
 
-            if (!insertResults) {
-                return new Response('Error: Failed to store OAuth session', {
-                    status: 500,
-                    headers: { 'Content-Type': 'text/plain' }
-                });
-            }
+            if (!insertResults) { return new Response('Error: Failed to store OAuth session', { status: 500, headers: { 'Content-Type': 'text/plain' } }); }
 
             // Fetch activity data for the last day
             const today = new Date();
@@ -89,12 +67,10 @@ export async function onRequestGet({ request, env }): Promise<Response> {
             });
 
             const activityData = await activityResponse.json();
-            console.log('Activity Data:', activityData);
 
             if (activityData.status !== 0) {
                 console.error('Failed to fetch activity data:', activityData);
             }
-
 
             const responseData = {
                 serviceUserId,

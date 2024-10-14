@@ -37,7 +37,7 @@ export async function ensureTablesExist(db) {
                     await db.exec(`
                         CREATE TABLE oauth_states (
                             state TEXT PRIMARY KEY,
-                            user_id TEXT NOT NULL,
+                            user_id TEXT NOT NULL UNIQUE,
                             service_id TEXT NOT NULL,
                             expires_at DATETIME NOT NULL,
                             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,

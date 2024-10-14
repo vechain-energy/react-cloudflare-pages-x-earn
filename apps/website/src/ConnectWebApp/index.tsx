@@ -10,7 +10,7 @@ const WebProviders = [
 ]
 
 export function ConnectWebApp() {
-    const { isConnected, } = useAccount()
+    const { isConnected, address } = useAccount()
 
     if (!isConnected) {
         return <p>Please connect your wallet to view your profile.</p>
@@ -25,7 +25,7 @@ export function ConnectWebApp() {
                     <Fragment key={provider.id}>
                         <dt className="font-medium text-sm">{provider.title}:</dt>
                         <dd className='font-mono text-xs text-right'>
-                            <a href={`${BACKEND_URL}/connect/oauth/${provider.id}`}>Connect</a>
+                            <a href={`${BACKEND_URL}/connect/oauth/${provider.id}?user_id=${encodeURIComponent(String(address))}`}>Connect</a>
                         </dd>
                     </Fragment>
                 ))}
