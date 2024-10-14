@@ -39,8 +39,8 @@ export async function onRequestGet({ request, env }): Promise<Response> {
             if (!tokenData.body.access_token) { return new Response('Failed to obtain access token', { status: 500 }); }
 
             const serviceUserId = `withings://${tokenData.body.userid}`
-            const { results: insertResults } = await env.DB.prepare("INSERT OR REPLACE INTO oauth_sessions (state, user_id, service_user_id, access_token, refresh_token, expires_at) VALUES (?, ?, ?, ?, ?, datetime('now', '+' || ? || ' seconds'))")
-                .bind(state, results[0].user_id, serviceUserId, tokenData.body.access_token, tokenData.body.refresh_token, tokenData.body.expires_in)
+            const { results: insertResults } = await env.DB.prepare("INSERT OR REPLACE INTO oauth_sessions (state, user_id, service_id, service_user_id, access_token, refresh_token, expires_at) VALUES (?, ?, ?, ?, ?, ?, datetime('now', '+' || ? || ' seconds'))")
+                .bind(state, results[0].user_id, results[0].service_id, serviceUserId, tokenData.body.access_token, tokenData.body.refresh_token, tokenData.body.expires_in)
                 .run();
 
             if (!insertResults) { return new Response('Error: Failed to store OAuth session', { status: 500, headers: { 'Content-Type': 'text/plain' } }); }

@@ -23,6 +23,7 @@ export async function ensureTablesExist(db) {
                         CREATE TABLE oauth_sessions (
                             state TEXT PRIMARY KEY,
                             user_id TEXT NOT NULL,
+                            service_id TEXT NOT NULL,
                             service_user_id TEXT NOT NULL,
                             access_token TEXT NOT NULL,
                             refresh_token TEXT NOT NULL,
