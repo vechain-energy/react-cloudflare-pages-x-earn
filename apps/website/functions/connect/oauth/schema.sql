@@ -1,5 +1,5 @@
 CREATE TABLE users (
-    address TEXT PRIMARY KEY,
+    id TEXT PRIMARY KEY,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
@@ -7,6 +7,7 @@ CREATE TABLE users (
 CREATE TABLE oauth_sessions (
     state TEXT PRIMARY KEY,
     user_id TEXT NOT NULL,
+    service_user_id TEXT NOT NULL,
     access_token TEXT NOT NULL,
     refresh_token TEXT NOT NULL,
     expires_at DATETIME NOT NULL,
