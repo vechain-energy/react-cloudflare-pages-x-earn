@@ -18,6 +18,21 @@ export async function onRequestGet({ request, env, params }): Promise<Response> 
 
     await ensureTablesExist(env.DB)
 
+    // Create user on demand if not exists
+    const { results: existingUser } = await env.DB.prepare("SELECT id FROM users WHERE id = ?")
+        .bind(userId)
+        .all();
+
+    if (!existingUser || existingUser.length === 0) {
+        const { results: newUser } = await env.DB.prepare("INSERT INTO users (id) VALUES (?)")
+            .bind(userId)
+            .run();
+
+        if (!newUser) {
+            return new Response('Error: Failed to create user', { status: 500, headers: { 'Content-Type': 'text/plain' } });
+        }
+    }
+
     switch (params.serviceId) {
         case 'withings':
             if (!env.WITHINGS_CLIENT_ID || !env.WITHINGS_SECRET) { return new Response('Error: Withings app not configured', { status: 500, headers: { 'Content-Type': 'text/plain' } }); }
