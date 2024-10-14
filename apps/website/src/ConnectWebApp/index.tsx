@@ -1,6 +1,7 @@
 import { Fragment } from 'react';
 import { BACKEND_URL } from '~/config';
 import { useAccount } from 'wagmi'
+import { useQuery } from '@tanstack/react-query'
 
 const WebProviders = [
     {
@@ -11,6 +12,14 @@ const WebProviders = [
 
 export function ConnectWebApp() {
     const { isConnected, address } = useAccount()
+
+    const { data: connectedServices = [] } = useQuery({
+        queryKey: ['connectedServices', address],
+        queryFn: () => 
+            fetch(`${BACKEND_URL}/connect/status/${address}`)
+                .then(response => response.json()),
+        enabled: !!address,
+    })
 
     if (!isConnected) {
         return <p>Please connect your wallet to view your profile.</p>
@@ -25,7 +34,11 @@ export function ConnectWebApp() {
                     <Fragment key={provider.id}>
                         <dt className="font-medium text-sm">{provider.title}:</dt>
                         <dd className='font-mono text-xs text-right'>
-                            <a href={`${BACKEND_URL}/connect/oauth/${provider.id}?user_id=${encodeURIComponent(String(address))}`}>Connect</a>
+                            {connectedServices.includes(provider.id) ? (
+                                <span>Connected</span>
+                            ) : (
+                                <a href={`${BACKEND_URL}/connect/oauth/${provider.id}?user_id=${encodeURIComponent(String(address))}`}>Connect</a>
+                            )}
                         </dd>
                     </Fragment>
                 ))}
