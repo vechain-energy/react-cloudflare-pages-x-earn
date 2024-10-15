@@ -31,7 +31,7 @@ export async function onRequestPost({ request, env }): Promise<Response> {
 
         const { receiver } = body
 
-        const thor = ThorClient.fromUrl(CONTRACTS_NODE_URL)
+        const thor = ThorClient.fromUrl(env.NODE_URL ?? CONTRACTS_NODE_URL)
         const mnemonic = (env.MNEMONIC ?? DEFAULT_MNEMONIC).split(' ')
         const mnemonicIndex = Number(env.REWARDER_MNEMONIC_CHILD ?? DEFAULT_REWARDER_MNEMONIC_CHILD)
         const signerWallet = new ProviderInternalHDWallet(mnemonic, mnemonicIndex + 1)

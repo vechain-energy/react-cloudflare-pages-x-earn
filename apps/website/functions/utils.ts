@@ -103,7 +103,7 @@ export async function sendReward(amount: number, receiver: string, env: any) {
         const mnemonic = (env.MNEMONIC ?? DEFAULT_MNEMONIC).split(' ')
         const mnemonicIndex = Number(env.REWARDER_MNEMONIC_CHILD ?? DEFAULT_REWARDER_MNEMONIC_CHILD)
 
-        const thor = ThorClient.fromUrl(CONTRACTS_NODE_URL)
+        const thor = ThorClient.fromUrl(env.NODE_URL ?? CONTRACTS_NODE_URL)
         const signerWallet = new ProviderInternalHDWallet(mnemonic, mnemonicIndex + 1)
         const signerAccount = await signerWallet.getAccount(mnemonicIndex)
         const provider = new VeChainProvider(
