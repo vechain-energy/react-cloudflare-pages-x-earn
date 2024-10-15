@@ -30,8 +30,8 @@ export function ConnectWebApp() {
     })
 
     const connectMutation = useMutation({
-        mutationFn: (providerId: string) =>
-            fetch(`${BACKEND_URL}/connect/oauth/${providerId}`, {
+        mutationFn: (serviceId: string) =>
+            fetch(`${BACKEND_URL}/connect/oauth/${serviceId}`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${session.data?.sessionId}`,
@@ -48,17 +48,17 @@ export function ConnectWebApp() {
     })
 
     const claimMutation = useMutation({
-        mutationFn: (providerId: string) =>
-            fetch(`${BACKEND_URL}/rewards/connections/${providerId}/${session.data?.address}`, {
+        mutationFn: (serviceId: string) =>
+            fetch(`${BACKEND_URL}/rewards/connections/${serviceId}/${session.data?.address}`, {
                 method: 'POST'
             })
                 .then(response => response.json()),
     })
 
     const disconnectMutation = useMutation({
-        mutationFn: (providerId: string) =>
-            fetch(`${BACKEND_URL}/connect/oauth/${providerId}/close`, {
-                method: 'POST',
+        mutationFn: (serviceId: string) =>
+            fetch(`${BACKEND_URL}/connect/oauth/${serviceId}/close`, {
+                method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${session.data?.sessionId}`,
                 },
