@@ -5,6 +5,7 @@ import {
     ProviderInternalBaseWallet,
     ProviderInternalHDWallet,
 } from '@vechain/sdk-network';
+import { Units } from '@vechain/sdk-core
 import { Addresses, ABI, CONTRACTS_NODE_URL } from '../src/config'
 
 export async function ensureTablesExist(db) {
@@ -102,7 +103,7 @@ export async function sendReward(amount: number, receiver: string, env: any) {
     try {
         const mnemonic = (env.MNEMONIC ?? DEFAULT_MNEMONIC).split(' ')
         const mnemonicIndex = Number(env.REWARDER_MNEMONIC_CHILD ?? DEFAULT_REWARDER_MNEMONIC_CHILD)
-        const nodeUrl =env.NODE_URL ?? CONTRACTS_NODE_URL
+        const nodeUrl = env.NODE_URL ?? CONTRACTS_NODE_URL
 
         const thor = ThorClient.fromUrl(nodeUrl)
         const signerWallet = new ProviderInternalHDWallet(mnemonic, mnemonicIndex + 1)
@@ -114,7 +115,7 @@ export async function sendReward(amount: number, receiver: string, env: any) {
         const signer = await provider.getSigner(signerAccount.address);
 
         const x2App = new Contract(Addresses.X2EarnApp, ABI, thor, signer)
-        const result = await x2App.transact.rewardAmountTo(amount, receiver)
+        const result = await x2App.transact.rewardAmountTo(Units.parseUnits(String(amount), 18), receiver)
 
         return {
             nodeUrl,
