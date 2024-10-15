@@ -1,7 +1,7 @@
 import { Fragment } from 'react';
 import { BACKEND_URL } from '~/config';
 import { useAccount } from 'wagmi'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import { useSession } from '~/hooks/useSession'
 
 const WebProviders = [
@@ -18,13 +18,31 @@ export function ConnectWebApp() {
     const { data: connectedServices = [] } = useQuery({
         queryKey: ['connectedServices', address],
         queryFn: () =>
-            fetch(`${BACKEND_URL}/connect/status/${address}`, {
+            fetch(`${BACKEND_URL}/connect/status`, {
                 headers: {
                     'Authorization': `Bearer ${session.data?.sessionId}`
                 }
             })
                 .then(response => response.json()),
-        enabled: Boolean(address) && Boolean(session.data?.sessionId),
+        enabled: Boolean(session.data?.sessionId),
+    })
+
+    const connectMutation = useMutation({
+        mutationFn: (providerId: string) =>
+            fetch(`${BACKEND_URL}/connect/oauth/${providerId}`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${session.data?.sessionId}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    redirect_uri: window.location.href,
+                }),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    window.location.href = data.redirectUrl
+                }),
     })
 
     if (!isConnected) {
@@ -43,7 +61,7 @@ export function ConnectWebApp() {
                             {connectedServices.includes(provider.id) ? (
                                 <span>Connected</span>
                             ) : (
-                                <a href={`${BACKEND_URL}/connect/oauth/${provider.id}?user_id=${encodeURIComponent(String(address))}&redirect_uri=${encodeURIComponent(window.location.href)}`}>Connect</a>
+                                <button onClick={() => connectMutation.mutate(provider.id)}>Connect</button>
                             )}
                         </dd>
                     </Fragment>

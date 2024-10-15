@@ -63,3 +63,21 @@ export async function ensureTablesExist(db) {
         }
     }
 }
+
+
+export async function validateSession(env, authHeader) {
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return { valid: false, error: 'Invalid or missing Authorization header', status: 401 };
+    }
+
+    const sessionId = authHeader.split(' ')[1];
+    const { results: sessionResults } = await env.DB.prepare("SELECT * FROM user_sessions WHERE id = ? AND expires_at > datetime('now')")
+        .bind(sessionId)
+        .all();
+
+    if (!sessionResults || sessionResults.length === 0) {
+        return { valid: false, error: 'Invalid or expired session', status: 401 };
+    }
+
+    return { valid: true, session: sessionResults[0] };
+}
