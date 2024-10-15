@@ -1,6 +1,6 @@
 import { Certificate } from '@vechain/sdk-core';
 import { uuid } from '@cfworker/uuid';
-import { ensureTablesExist } from './utils';
+import { ensureTablesExist } from '../utils';
 
 const SESSION_EXPIRY_SECONDS = 24 * 60 * 60
 
