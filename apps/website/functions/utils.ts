@@ -5,7 +5,7 @@ import {
     ProviderInternalBaseWallet,
     ProviderInternalHDWallet,
 } from '@vechain/sdk-network';
-import { Units } from '@vechain/sdk-core
+import { Units } from '@vechain/sdk-core'
 import { Addresses, ABI, CONTRACTS_NODE_URL } from '../src/config'
 
 export async function ensureTablesExist(db) {
