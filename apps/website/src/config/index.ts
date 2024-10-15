@@ -50,4 +50,4 @@ export const APP_DESCRIPTION = process.env.APP_DESCRIPTION ?? "This is an exampl
 export const APP_ICONS = (process.env.APP_ICONS ?? "").split(',');
 
 // backend url, should by / in default deployment, but could be different (in development for example)
-export const BACKEND_URL = process.env.BACKEND_URL ?? '/'
+export const BACKEND_URL = process.env.BACKEND_URL ?? '/api/'

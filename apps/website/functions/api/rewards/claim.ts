@@ -5,7 +5,7 @@ import {
     ProviderInternalBaseWallet,
     ProviderInternalHDWallet,
 } from '@vechain/sdk-network';
-import getConfig from '../config';
+import getConfig from '../../config';
 
 const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
