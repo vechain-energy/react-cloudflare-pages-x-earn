@@ -1,7 +1,7 @@
-name = "x-earn-website"
-pages_build_output_dir = "./dist"
-compatibility_date = "2023-10-12"
-compatibility_flags = ["nodejs_compat_v2"]
+# name = "x-earn-website"
+# pages_build_output_dir = "./dist"
+# compatibility_date = "2023-10-12"
+# compatibility_flags = ["nodejs_compat_v2"]
 
 # [vars]
 # MNEMONIC = "denial kitchen pet squirrel other broom bar gas better priority spoil cross"
@@ -10,7 +10,7 @@ compatibility_flags = ["nodejs_compat_v2"]
 # WITHINGS_CLIENT_ID = ""
 # WITHINGS_SECRET = ""
 
-[[d1_databases]]
-binding = "DB"
-database_name = "db"
-database_id = "cabd289f-ddb3-4a6c-939d-6bc761744b06"
+# [[d1_databases]]
+# binding = "DB"
+# database_name = "db"
+# database_id = "cabd289f-ddb3-4a6c-939d-6bc761744b06"
