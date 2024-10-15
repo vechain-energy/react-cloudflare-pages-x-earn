@@ -61,6 +61,7 @@ function Providers({ children }: { children: React.ReactNode }) {
             genesis={genesis}
             usePersistence
             walletConnectOptions={walletConnectOptions}
+            requireCertificate
         >
             <DAppKitConsumers>{children}</DAppKitConsumers>
         </DAppKitProvider>

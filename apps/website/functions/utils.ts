@@ -1,5 +1,5 @@
 export async function ensureTablesExist(db) {
-    const tables = ['oauth_sessions', 'oauth_states', 'users'];
+    const tables = ['oauth_sessions', 'oauth_states', 'users', 'user_sessions'];
     for (const table of tables) {
         const { results } = await db
             .prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name=?`)
@@ -7,19 +7,18 @@ export async function ensureTablesExist(db) {
             .all();
 
         if (results.length === 0) {
-            let query = '';
             switch (table) {
                 case 'users':
-                    await db.exec(`
+                    await db.prepare(`
                         CREATE TABLE users (
                             id TEXT PRIMARY KEY,
                             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                             updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
                         );
-                    `);
+                    `).all()
                     break;
                 case 'oauth_sessions':
-                    await db.exec(`
+                    await db.prepare(`
                         CREATE TABLE oauth_sessions (
                             state TEXT PRIMARY KEY,
                             user_id TEXT NOT NULL,
@@ -32,10 +31,10 @@ export async function ensureTablesExist(db) {
                             updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                             FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
                         );
-                    `);
+                    `).all()
                     break;
                 case 'oauth_states':
-                    await db.exec(`
+                    await db.prepare(`
                         CREATE TABLE oauth_states (
                             state TEXT PRIMARY KEY,
                             user_id TEXT NOT NULL UNIQUE,
@@ -45,7 +44,20 @@ export async function ensureTablesExist(db) {
                             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                             FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
                         );
-                    `);
+                    `).all()
+                    break;
+                case 'user_sessions':
+                    await db.prepare(`
+                        CREATE TABLE user_sessions (
+                            id TEXT PRIMARY KEY,
+                            user_id TEXT NOT NULL,
+                            session_token TEXT NOT NULL UNIQUE,
+                            expires_at DATETIME NOT NULL,
+                            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+                        );
+                    `).all()
                     break;
             }
         }

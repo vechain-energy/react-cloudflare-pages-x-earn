@@ -1,5 +1,4 @@
 // @TODO: add process validation
-
 export async function onRequestGet({ request, env }): Promise<Response> {
     const url = new URL(request.url);
     const code = url.searchParams.get('code') ?? '';

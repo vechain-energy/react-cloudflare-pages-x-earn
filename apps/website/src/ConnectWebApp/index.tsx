@@ -2,6 +2,7 @@ import { Fragment } from 'react';
 import { BACKEND_URL } from '~/config';
 import { useAccount } from 'wagmi'
 import { useQuery } from '@tanstack/react-query'
+import { useSession } from '~/hooks/useSession'
 
 const WebProviders = [
     {
@@ -12,13 +13,18 @@ const WebProviders = [
 
 export function ConnectWebApp() {
     const { isConnected, address } = useAccount()
+    const session = useSession()
 
     const { data: connectedServices = [] } = useQuery({
         queryKey: ['connectedServices', address],
-        queryFn: () => 
-            fetch(`${BACKEND_URL}/connect/status/${address}`)
+        queryFn: () =>
+            fetch(`${BACKEND_URL}/connect/status/${address}`, {
+                headers: {
+                    'Authorization': `Bearer ${session.data?.sessionId}`
+                }
+            })
                 .then(response => response.json()),
-        enabled: !!address,
+        enabled: Boolean(address) && Boolean(session.data?.sessionId),
     })
 
     if (!isConnected) {

@@ -6,12 +6,13 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "parcel src/index.html",
     "build": "parcel build src/index.html --no-scope-hoist --no-source-maps",
-    "dev:pages": "wrangler pages dev ./"
+    "dev:pages": "wrangler pages dev ./ --compatibility-date=2024-10-15 --compatibility-flags=nodejs_compat_v2 --d1 DB"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@cfworker/uuid": "^2.1.0",
     "@headlessui/react": "^2.1.8",
     "@heroicons/react": "^2.1.5",
     "@tanstack/react-query": "^5.56.2",
