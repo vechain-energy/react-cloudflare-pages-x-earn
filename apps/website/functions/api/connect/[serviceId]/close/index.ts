@@ -2,11 +2,11 @@ import { validateSession } from "../../../../utils";
 
 const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'DELETE, OPTIONS',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization'
 };
 
-export const onRequestDelete = async ({ request, env, params }) => {
+export const onRequestPost = async ({ request, env, params }) => {
     const sessionValidation = await validateSession(env, request.headers.get('Authorization'));
 
     if (!sessionValidation.valid) {
