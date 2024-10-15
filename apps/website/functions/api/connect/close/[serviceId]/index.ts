@@ -1,4 +1,4 @@
-import { validateSession } from "../../../utils";
+import { validateSession } from "../../../../utils";
 
 const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
