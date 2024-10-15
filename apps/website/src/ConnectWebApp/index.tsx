@@ -57,7 +57,7 @@ export function ConnectWebApp() {
 
     const disconnectMutation = useMutation({
         mutationFn: (serviceId: string) =>
-            fetch(`${BACKEND_URL}/connect/oauth/${serviceId}/close`, {
+            fetch(`${BACKEND_URL}/connect/${serviceId}/close`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${session.data?.sessionId}`,
