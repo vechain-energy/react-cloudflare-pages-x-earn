@@ -9,7 +9,7 @@ import ErrorMessage from '~/common/ErrorMessage';
 const WebProviders = [
     {
         id: 'withings',
-        title: 'withings',
+        title: 'Withings',
     }
 ]
 
@@ -17,7 +17,7 @@ export function ConnectWebApp() {
     const { isConnected, address } = useAccount()
     const session = useSession()
 
-    const { data: connectedServices = [] } = useQuery({
+    const { data: connectedServices = [], refetch: refetchConnectedServices } = useQuery({
         queryKey: ['connectedServices', address],
         queryFn: () =>
             fetch(`${BACKEND_URL}/connect/status`, {
@@ -55,6 +55,20 @@ export function ConnectWebApp() {
                 .then(response => response.json()),
     })
 
+    const disconnectMutation = useMutation({
+        mutationFn: (providerId: string) =>
+            fetch(`${BACKEND_URL}/connect/oauth/${providerId}/close`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${session.data?.sessionId}`,
+                },
+            })
+                .then(response => response.json()),
+        onSuccess: () => {
+            refetchConnectedServices()
+        },
+    })
+
     if (!isConnected) {
         return <p>Please connect your wallet to view your profile.</p>
     }
@@ -67,24 +81,38 @@ export function ConnectWebApp() {
                 {WebProviders.map(provider => (
                     <Fragment key={provider.id}>
                         <dt className="font-medium text-sm">{provider.title}:</dt>
-                        <dd className='font-mono text-xs text-right'>
+                        <dd className='font-mono text-xs'>
                             {connectedServices.includes(provider.id) ? (
-                                <button 
-                                    onClick={() => claimMutation.mutate(provider.id)}
-                                    disabled={claimMutation.isPending}
-                                >
-                                    Connected: {claimMutation.isPending ? 'Claiming...' : 'Test Claim'}
-                                </button>
+                                'Connected'
                             ) : (
                                 <button onClick={() => connectMutation.mutate(provider.id)}>Connect</button>
+                            )}
+                        </dd>
+                        <dd className='font-mono text-xs text-right'>
+                            {connectedServices.includes(provider.id) && (
+                                <>
+                                    <button
+                                        onClick={() => claimMutation.mutate(provider.id)}
+                                        disabled={claimMutation.isPending}
+                                        className="mr-2"
+                                    >
+                                        {claimMutation.isPending ? 'Claiming...' : 'Test Claim'}
+                                    </button>
+                                    <button
+                                        onClick={() => disconnectMutation.mutate(provider.id)}
+                                        disabled={disconnectMutation.isPending}
+                                    >
+                                        {disconnectMutation.isPending ? 'Disconnecting...' : 'Disconnect'}
+                                    </button>
+                                </>
                             )}
                         </dd>
                     </Fragment>
                 ))}
             </dl>
 
-
             {claimMutation.isError && <ErrorMessage>{claimMutation.error.message}</ErrorMessage>}
+            {disconnectMutation.isError && <ErrorMessage>{disconnectMutation.error.message}</ErrorMessage>}
             {claimMutation.data?.reward?.txId && <Transaction txId={claimMutation.data.reward.txId} />}
         </div>
     )

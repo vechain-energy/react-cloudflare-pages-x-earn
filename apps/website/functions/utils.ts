@@ -6,7 +6,7 @@ import {
     ProviderInternalHDWallet,
 } from '@vechain/sdk-network';
 import { Units } from '@vechain/sdk-core'
-import { Addresses, ABI, CONTRACTS_NODE_URL } from '../src/config'
+import getConfig from './config';
 
 export async function ensureTablesExist(db) {
     const tables = ['oauth_sessions', 'oauth_states', 'users', 'user_sessions'];
@@ -77,7 +77,6 @@ export async function ensureTablesExist(db) {
     }
 }
 
-
 export async function validateSession(env, authHeader) {
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
         return { valid: false, error: 'Invalid or missing Authorization header', status: 401 };
@@ -100,6 +99,8 @@ const DEFAULT_MNEMONIC = 'denial kitchen pet squirrel other broom bar gas better
 const DEFAULT_REWARDER_MNEMONIC_CHILD = 3
 
 export async function sendReward(amount: number, receiver: string, env: any) {
+    const { Addresses, ABI, CONTRACTS_NODE_URL } = getConfig(env)
+
     try {
         const mnemonic = (env.MNEMONIC ?? DEFAULT_MNEMONIC).split(' ')
         const mnemonicIndex = Number(env.REWARDER_MNEMONIC_CHILD ?? DEFAULT_REWARDER_MNEMONIC_CHILD)

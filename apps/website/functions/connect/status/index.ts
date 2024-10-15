@@ -2,11 +2,11 @@ import { validateSession } from "../../utils";
 
 const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'GET, OPTIONS',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization'
 };
 
-export const onRequestGet = async ({ request, env }) => {
+export const onRequestPost = async ({ request, env }) => {
     const sessionValidation = await validateSession(env, request.headers.get('Authorization'));
 
     if (!sessionValidation.valid) {
@@ -25,20 +25,34 @@ export const onRequestGet = async ({ request, env }) => {
     }
 
     try {
-        const query = `SELECT DISTINCT service_id FROM oauth_sessions WHERE user_id = ?`;
+        const { serviceId } = await request.json();
+
+        if (!serviceId) {
+            return new Response('Service ID is required', { 
+                status: 400,
+                headers: corsHeaders
+            });
+        }
+
+        const query = `DELETE FROM oauth_sessions WHERE user_id = ? AND service_id = ?`;
 
         const result = await env.DB.prepare(query)
-            .bind(userId)
-            .all();
+            .bind(userId, serviceId)
+            .run();
 
-        const connectedServices = result.results.map(row => row.service_id);
-
-        return new Response(JSON.stringify(connectedServices), {
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-            status: 200,
-        });
+        if (result.changes > 0) {
+            return new Response(JSON.stringify({ message: 'Service disconnected successfully' }), {
+                headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+                status: 200,
+            });
+        } else {
+            return new Response(JSON.stringify({ message: 'No matching service found to disconnect' }), {
+                headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+                status: 404,
+            });
+        }
     } catch (error) {
-        console.error('Error fetching connected services:', error);
+        console.error('Error disconnecting service:', error);
         return new Response('Internal Server Error', { 
             status: 500,
             headers: corsHeaders

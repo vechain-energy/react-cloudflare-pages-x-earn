@@ -5,7 +5,7 @@ import {
     ProviderInternalBaseWallet,
     ProviderInternalHDWallet,
 } from '@vechain/sdk-network';
-import { Addresses, ABI, CONTRACTS_NODE_URL } from '../../src/config'
+import getConfig from '../config';
 
 const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
@@ -25,6 +25,8 @@ const DEFAULT_MNEMONIC = 'denial kitchen pet squirrel other broom bar gas better
 const DEFAULT_REWARDER_MNEMONIC_CHILD = 3
 
 export async function onRequestPost({ request, env }): Promise<Response> {
+    const { Addresses, ABI, CONTRACTS_NODE_URL } = getConfig(env)
+
     try {
         const body = await request.json()
         console.log('Incoming request', body);
