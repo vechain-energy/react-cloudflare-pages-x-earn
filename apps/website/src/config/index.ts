@@ -13,12 +13,12 @@ export const Networks = {
 export const WALLET_CONNECT_PROJECT_ID = process.env.WALLET_CONNECT_PROJECT_ID ?? "";
 
 // the network to use, based on the node to connect to
-export const NODE_URL = process.env.NODE_URL ?? `https://testnet.vechain.org`;
-export const NETWORK = process.env.NETWORK ?? "test";
+export const NODE_URL = process.env.NODE_URL ?? `http://localhost:8669`;
+export const NETWORK: keyof typeof Networks = process.env.NETWORK as keyof typeof Networks ?? "solo"
 
-export const Addresses = Networks[NETWORK]?.Addresses
-export const ABI = Networks[NETWORK]?.ABI
-export const CONTRACTS_NODE_URL = Networks[NETWORK]?.CONTRACTS_NODE_URL
+export const Addresses = Networks[NETWORK].Addresses
+export const ABI = Networks[NETWORK].ABI
+export const CONTRACTS_NODE_URL = Networks[NETWORK].CONTRACTS_NODE_URL
 
 export const SOLO_BLOCK = {
     "number": 0,

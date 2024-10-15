@@ -1,12 +1,24 @@
+import {
+    Contract,
+    ThorClient,
+    VeChainProvider,
+    ProviderInternalBaseWallet,
+    ProviderInternalHDWallet,
+} from '@vechain/sdk-network';
+import { Addresses, ABI, CONTRACTS_NODE_URL } from '../src/config'
+
 export async function ensureTablesExist(db) {
     const tables = ['oauth_sessions', 'oauth_states', 'users', 'user_sessions'];
-    for (const table of tables) {
-        const { results } = await db
-            .prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name=?`)
-            .bind(table)
-            .all();
+    const placeholders = tables.map(() => '?').join(',');
+    const { results } = await db
+        .prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name IN (${placeholders})`)
+        .bind(...tables)
+        .all();
 
-        if (results.length === 0) {
+    const existingTables = new Set(results.map(row => row.name));
+
+    for (const table of tables) {
+        if (!existingTables.has(table)) {
             switch (table) {
                 case 'users':
                     await db.prepare(`
@@ -15,7 +27,7 @@ export async function ensureTablesExist(db) {
                             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                             updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
                         );
-                    `).all()
+                    `).run();
                     break;
                 case 'oauth_sessions':
                     await db.prepare(`
@@ -31,7 +43,7 @@ export async function ensureTablesExist(db) {
                             updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                             FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
                         );
-                    `).all()
+                    `).run();
                     break;
                 case 'oauth_states':
                     await db.prepare(`
@@ -44,7 +56,7 @@ export async function ensureTablesExist(db) {
                             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                             FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
                         );
-                    `).all()
+                    `).run();
                     break;
                 case 'user_sessions':
                     await db.prepare(`
@@ -57,7 +69,7 @@ export async function ensureTablesExist(db) {
                             updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                             FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
                         );
-                    `).all()
+                    `).run();
                     break;
             }
         }
@@ -80,4 +92,36 @@ export async function validateSession(env, authHeader) {
     }
 
     return { valid: true, session: sessionResults[0] };
+}
+
+// the default signer is a solo node seeded account
+const DEFAULT_MNEMONIC = 'denial kitchen pet squirrel other broom bar gas better priority spoil cross'
+const DEFAULT_REWARDER_MNEMONIC_CHILD = 3
+
+export async function sendReward(amount: number, receiver: string, env: any) {
+    try {
+        const mnemonic = (env.MNEMONIC ?? DEFAULT_MNEMONIC).split(' ')
+        const mnemonicIndex = Number(env.REWARDER_MNEMONIC_CHILD ?? DEFAULT_REWARDER_MNEMONIC_CHILD)
+
+        const thor = ThorClient.fromUrl(CONTRACTS_NODE_URL)
+        const signerWallet = new ProviderInternalHDWallet(mnemonic, mnemonicIndex + 1)
+        const signerAccount = await signerWallet.getAccount(mnemonicIndex)
+        const provider = new VeChainProvider(
+            thor,
+            new ProviderInternalBaseWallet([signerAccount]),
+        );
+        const signer = await provider.getSigner(signerAccount.address);
+
+        const x2App = new Contract(Addresses.X2EarnApp, ABI, thor, signer)
+        const result = await x2App.transact.rewardAmountTo(amount, receiver)
+
+        return {
+            nodeUrl: CONTRACTS_NODE_URL,
+            rewarderAddress: signerAccount?.address,
+            txId: result.id
+        }
+    } catch (error) {
+        console.error('Error in sendReward:', error);
+        throw error;
+    }
 }

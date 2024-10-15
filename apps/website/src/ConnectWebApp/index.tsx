@@ -59,7 +59,7 @@ export function ConnectWebApp() {
                         <dt className="font-medium text-sm">{provider.title}:</dt>
                         <dd className='font-mono text-xs text-right'>
                             {connectedServices.includes(provider.id) ? (
-                                <span>Connected</span>
+                                <a href={`${BACKEND_URL}/rewards/connections/${provider.id}/${session.data?.address}`} target="_blank" rel="noopener noreferrer">Connected,´: Test Claim</a>
                             ) : (
                                 <button onClick={() => connectMutation.mutate(provider.id)}>Connect</button>
                             )}

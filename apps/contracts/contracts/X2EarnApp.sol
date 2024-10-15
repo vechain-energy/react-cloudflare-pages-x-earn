@@ -43,4 +43,10 @@ contract X2EarnApp is Initializable, AccessControlUpgradeable, UUPSUpgradeable {
     function rewardTo(address receiver) public onlyRole(REWARDER_ROLE) {
         rewardsPool.distributeReward(bytes32(0), 2 ether, receiver, "");
     }
+    function rewardAmountTo(
+        uint256 amount,
+        address receiver
+    ) public onlyRole(REWARDER_ROLE) {
+        rewardsPool.distributeReward(bytes32(0), amount, receiver, "");
+    }
 }
