@@ -13,7 +13,7 @@ export async function onRequestPost({ request, env, params }): Promise<Response>
     const session = sessionValidation.session;
     const userId = session.user_id;
 
-    const redirectUri = encodeURIComponent(`https://${request.headers.get('host')}/connect/oauth/callback`);
+    const redirectUri = encodeURIComponent(`https://${request.headers.get('host')}/api/connect/oauth/callback`);
     const state = `${params.serviceId}:${Math.random().toString(36).substring(2)}`;
 
     // Parse the request body
