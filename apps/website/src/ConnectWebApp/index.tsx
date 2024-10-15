@@ -3,6 +3,8 @@ import { BACKEND_URL } from '~/config';
 import { useAccount } from 'wagmi'
 import { useQuery, useMutation } from '@tanstack/react-query'
 import { useSession } from '~/hooks/useSession'
+import Transaction from '~/common/Transaction';
+import ErrorMessage from '~/common/ErrorMessage';
 
 const WebProviders = [
     {
@@ -45,6 +47,14 @@ export function ConnectWebApp() {
                 }),
     })
 
+    const claimMutation = useMutation({
+        mutationFn: (providerId: string) =>
+            fetch(`${BACKEND_URL}/rewards/connections/${providerId}/${session.data?.address}`, {
+                method: 'POST'
+            })
+                .then(response => response.json()),
+    })
+
     if (!isConnected) {
         return <p>Please connect your wallet to view your profile.</p>
     }
@@ -59,7 +69,12 @@ export function ConnectWebApp() {
                         <dt className="font-medium text-sm">{provider.title}:</dt>
                         <dd className='font-mono text-xs text-right'>
                             {connectedServices.includes(provider.id) ? (
-                                <a href={`${BACKEND_URL}/rewards/connections/${provider.id}/${session.data?.address}`} target="_blank" rel="noopener noreferrer">Connected: Test Claim</a>
+                                <button 
+                                    onClick={() => claimMutation.mutate(provider.id)}
+                                    disabled={claimMutation.isPending}
+                                >
+                                    Connected: {claimMutation.isPending ? 'Claiming...' : 'Test Claim'}
+                                </button>
                             ) : (
                                 <button onClick={() => connectMutation.mutate(provider.id)}>Connect</button>
                             )}
@@ -68,6 +83,9 @@ export function ConnectWebApp() {
                 ))}
             </dl>
 
+
+            {claimMutation.isError && <ErrorMessage>{claimMutation.error.message}</ErrorMessage>}
+            {claimMutation.data?.txId && <Transaction txId={claimMutation.data.txId} />}
         </div>
     )
 }

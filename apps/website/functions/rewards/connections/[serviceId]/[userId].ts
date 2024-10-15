@@ -13,7 +13,7 @@ export async function onRequestOptions(): Promise<Response> {
     });
 }
 
-export async function onRequestGet({ params, env }): Promise<Response> {
+export async function onRequestPost({ params, env }): Promise<Response> {
     const { serviceId, userId } = params
 
     // Load service and user for the given serviceId & userId
