@@ -13,12 +13,12 @@ export async function onRequestOptions(): Promise<Response> {
     });
 }
 
-export async function onRequestPost({ request, params, env }): Promise<Response> {
+export async function onRequestGet({ params, env }): Promise<Response> {
     const { serviceId, userId } = params
 
     // Load service and user for the given serviceId & userId
     const { results: serviceResults } = await env.DB.prepare(
-        "SELECT * FROM oauth_sessions WHERE service_id = ? AND service_user_id = ?"
+        "SELECT * FROM oauth_sessions WHERE service_id = ? AND user_id = ?"
     )
         .bind(serviceId, userId)
         .all();
