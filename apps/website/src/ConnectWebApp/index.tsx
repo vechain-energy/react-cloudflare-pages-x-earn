@@ -85,7 +85,7 @@ export function ConnectWebApp() {
 
 
             {claimMutation.isError && <ErrorMessage>{claimMutation.error.message}</ErrorMessage>}
-            {claimMutation.data?.txId && <Transaction txId={claimMutation.data.txId} />}
+            {claimMutation.data?.reward?.txId && <Transaction txId={claimMutation.data.reward.txId} />}
         </div>
     )
 }
