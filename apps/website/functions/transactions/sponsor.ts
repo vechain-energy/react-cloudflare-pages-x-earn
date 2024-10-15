@@ -1,10 +1,13 @@
 import { Address, HDKey, Transaction, Secp256k1, Hex } from '@vechain/sdk-core';
 
+// the default signer is a solo node seeded account
+const DEFAULT_SIGNER = 'denial kitchen pet squirrel other broom bar gas better priority spoil cross'
+
 export async function onRequestPost({ request, env }): Promise<Response> {
     const body = await request.json()
     console.log('Incoming request', body);
 
-    const signerWallet = HDKey.fromMnemonic((env.SIGNER_MNEMONIC).split(' '), HDKey.VET_DERIVATION_PATH).deriveChild(0);
+    const signerWallet = HDKey.fromMnemonic((env.SIGNER_MNEMONIC ?? DEFAULT_SIGNER).split(' '), HDKey.VET_DERIVATION_PATH).deriveChild(0);
     if (!signerWallet.publicKey || !signerWallet.privateKey) { throw new Error('Could not load signing wallet') }
 
     const signerAddress = Address.ofPublicKey(signerWallet.publicKey)

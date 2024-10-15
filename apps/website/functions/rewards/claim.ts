@@ -20,6 +20,9 @@ export async function onRequestOptions(): Promise<Response> {
     });
 }
 
+// the default signer is a solo node seeded account
+const DEFAULT_SIGNER = 'denial kitchen pet squirrel other broom bar gas better priority spoil cross'
+
 export async function onRequestPost({ request, env }): Promise<Response> {
     try {
         const body = await request.json()
@@ -28,7 +31,7 @@ export async function onRequestPost({ request, env }): Promise<Response> {
         const { receiver } = body
 
         const thor = ThorClient.fromUrl(CONTRACTS_NODE_URL)
-        const signerWallet = new ProviderInternalHDWallet((env.MNEMONIC).split(' '), Number(env.REWARDER_MNEMONIC_CHILD) + 1)
+        const signerWallet = new ProviderInternalHDWallet((env.MNEMONIC ?? DEFAULT_SIGNER).split(' '), Number(env.REWARDER_MNEMONIC_CHILD) + 1)
         const signerAccount = await signerWallet.getAccount(Number(env.REWARDER_MNEMONIC_CHILD ?? 0))
         const provider = new VeChainProvider(
             thor,
