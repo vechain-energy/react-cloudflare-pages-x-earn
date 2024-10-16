@@ -10,7 +10,7 @@ export function ClaimRewardByBackend() {
 
     const { mutate: claimReward, data, isPending, isError, error } = useMutation({
         mutationFn: async () => {
-            const response = await fetch(`${BACKEND_URL}/api/rewards/claim`, {
+            const response = await fetch(`${BACKEND_URL}/rewards/claim`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
