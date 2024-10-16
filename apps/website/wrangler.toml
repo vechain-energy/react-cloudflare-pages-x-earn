@@ -18,3 +18,7 @@
 # binding = "DB"
 # database_name = "db"
 # database_id = ""
+
+# [[queues.producers]]
+# binding = "CLAIMS"
+# queue = "x-2-earn-claims"

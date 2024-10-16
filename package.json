@@ -18,7 +18,9 @@
     "website:start": "npm run start --prefix apps/website",
     "website:start:testnet": "NODE_ENV=testnet npm run start --prefix apps/website",
     "website:backend": "npm run dev:pages --prefix apps/website",
+    "website:queue-handler": "npm run dev --prefix apps/queue-handler",
     "website:backend:testnet": "npm run dev:pages --prefix apps/website",
+    "website:queue-handler:testnet": "npm run dev --prefix apps/queue-handler",
 
     "start": "npm run dev",
     "dev": "NODE_ENV=local ENV_FILE=`pwd`/.env.local turbo dev",

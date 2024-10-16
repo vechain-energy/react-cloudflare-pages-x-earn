@@ -1,5 +1,6 @@
 import { ClaimRewardByContract } from './ByContract';
 import { ClaimRewardByBackend } from './ByBackend';
+import { ClaimRewardByBackendProcess } from './ByBackendProcess'
 
 export function ClaimReward() {
     return (
@@ -9,6 +10,7 @@ export function ClaimReward() {
             <div className='space-y-8'>
                 <ClaimRewardByContract />
                 <ClaimRewardByBackend />
+                <ClaimRewardByBackendProcess />
             </div>
 
         </div>
