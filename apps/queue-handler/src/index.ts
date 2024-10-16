@@ -31,8 +31,8 @@ export default {
 				for (const service of services) {
 					if (service.service_id === 'withings') {
 						const rewards = await handleRewardForWithings(userId, service, env);
-						if(rewards > 0) {
-
+						if (rewards > 0) {
+							await sendReward(rewards, service.user_id, env)
 						}
 					}
 				}
@@ -173,32 +173,36 @@ async function handleRewardForWithings(userId: string, service: OAuthSession, en
 
 
 async function sendReward(amount: number, receiver: string, env: Env) {
-    const { Addresses, ABI, CONTRACTS_NODE_URL } = getConfig(env);
+	const { Addresses, ABI, CONTRACTS_NODE_URL } = getConfig(env);
 
-    try {
-        const mnemonic = (env.MNEMONIC ?? DEFAULT_MNEMONIC).split(' ');
-        const mnemonicIndex = Number(env.REWARDER_MNEMONIC_CHILD ?? DEFAULT_REWARDER_MNEMONIC_CHILD);
-        const nodeUrl = env.NODE_URL ?? CONTRACTS_NODE_URL;
+	try {
+		const mnemonic = (env.MNEMONIC ?? DEFAULT_MNEMONIC).split(' ');
+		const mnemonicIndex = Number(env.REWARDER_MNEMONIC_CHILD ?? DEFAULT_REWARDER_MNEMONIC_CHILD);
+		const nodeUrl = env.NODE_URL ?? CONTRACTS_NODE_URL;
 
-        const thor = ThorClient.fromUrl(nodeUrl);
-        const signerWallet = new ProviderInternalHDWallet(mnemonic, mnemonicIndex + 1);
-        const signerAccount = await signerWallet.getAccount(mnemonicIndex);
-        const provider = new VeChainProvider(
-            thor,
-            new ProviderInternalBaseWallet([signerAccount]),
-        );
-        const signer = await provider.getSigner(signerAccount.address);
+		console.log(`Preparing to send reward of ${amount} to ${receiver}`);
 
-        const x2App = new Contract(Addresses.X2EarnApp, ABI, thor, signer);
-        const result = await x2App.transact.rewardAmountTo(Units.parseUnits(String(amount), 18), receiver);
+		const thor = ThorClient.fromUrl(nodeUrl);
+		const signerWallet = new ProviderInternalHDWallet(mnemonic, mnemonicIndex + 1);
+		const signerAccount = await signerWallet.getAccount(mnemonicIndex);
+		const provider = new VeChainProvider(
+			thor,
+			new ProviderInternalBaseWallet([signerAccount]),
+		);
+		const signer = await provider.getSigner(signerAccount.address);
 
-        return {
-            nodeUrl,
-            rewarderAddress: signerAccount?.address,
-            txId: result.id
-        };
-    } catch (error) {
-        console.error('Error in sendReward:', error);
-        throw error;
-    }
+		const x2App = new Contract(Addresses.X2EarnApp, ABI, thor, signer);
+		const result = await x2App.transact.rewardAmountTo(Units.parseUnits(String(amount), 18), receiver);
+
+		console.log(`Reward transaction sent. Transaction ID: ${result.id}`);
+
+		return {
+			nodeUrl,
+			rewarderAddress: signerAccount?.address,
+			txId: result.id
+		};
+	} catch (error) {
+		console.error('Error in sendReward:', error);
+		throw error;
+	}
 }
