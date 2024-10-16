@@ -118,3 +118,7 @@ queue = "x-2-earn-claims"
 # [[vectorize]]
 # binding = "MY_INDEX"
 # index_name = "my-index"
+
+# Schedule the worker to run every day
+# [triggers]
+# crons = ["0 2 * * *"]

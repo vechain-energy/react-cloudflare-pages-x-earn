@@ -16,6 +16,28 @@ export default {
 		return new Response('Sent message to the queue');
 	},
 
+	// called in an interval
+	async scheduled(event, env, ctx): Promise<void> {
+		console.log(`trigger fired at ${event.cron}`);
+
+		console.log('Fetching distinct user IDs from oauth_sessions');
+		const { results } = await env.DB.prepare(
+			"SELECT DISTINCT user_id FROM oauth_sessions"
+		).all<{ user_id: string }>();
+
+		console.log(`Found ${results.length} distinct users`);
+
+		for (const { user_id } of results) {
+			console.log(`Sending message for user: ${user_id}`);
+			await env.CLAIMS.send({
+				method: "handleUser",
+				params: [user_id]
+			});
+		}
+
+		console.log('Finished sending messages for all users');
+	},
+
 	// The queue handler is invoked when a batch of messages is ready to be delivered
 	// https://developers.cloudflare.com/queues/platform/javascript-apis/#messagebatch
 	async queue(batch, env): Promise<void> {
