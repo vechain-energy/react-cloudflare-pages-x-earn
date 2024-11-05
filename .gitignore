@@ -5,3 +5,4 @@ node_modules
 dist/config.json
 apps/contracts/deployments/vechain_solo/
 data/thor
+.DS_Store

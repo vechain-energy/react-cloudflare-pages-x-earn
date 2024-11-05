@@ -32,7 +32,20 @@ const namedAccounts = {
 };
 
 const config = {
-  solidity: "0.8.20",
+  solidity: {
+    compilers: [
+      {
+        version: '0.8.20',
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 16
+          },
+          evmVersion: 'london'
+        }
+      },
+    ]
+  },
   defaultNetwork: "hardhat",
   networks: {
     hardhat: {
@@ -43,8 +56,6 @@ const config = {
       url: "http://localhost:8669",
       accounts,
       restful: true,
-      gas: 'auto',
-      gasPrice: 'auto',
       gasMultiplier: 1,
       loggingEnabled: true,
     },
@@ -52,8 +63,6 @@ const config = {
       url: "https://node-testnet.vechain.energy",
       accounts,
       restful: true,
-      gas: 'auto',
-      gasPrice: 'auto',
       gasMultiplier: 1,
 
       // optionally use fee delegation to let someone else pay the gas fees
