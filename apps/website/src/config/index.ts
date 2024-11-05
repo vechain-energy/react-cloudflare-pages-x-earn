@@ -12,6 +12,9 @@ export const Networks = {
 // must be set to enable VeWorld mobile connections on Desktop
 export const WALLET_CONNECT_PROJECT_ID = process.env.WALLET_CONNECT_PROJECT_ID ?? "";
 
+// obtain from https://dashboard.privy.io/
+export const PRIVY_APP_ID = process.env.PRIVY_APP_ID ?? "";
+
 // the network to use, based on the node to connect to
 export const NODE_URL = process.env.NODE_URL ?? `http://localhost:8669`;
 export const NETWORK: keyof typeof Networks = process.env.NETWORK as keyof typeof Networks ?? "solo"
@@ -42,7 +45,7 @@ export const SOLO_BLOCK = {
 }
 
 // if fee delegation will be used, the url to the delegation service
-export const DELEGATION_URL = process.env.DELEGATION_URL
+export const DELEGATION_URL = process.env.DELEGATION_URL ?? ''
 
 // app meta data, mainly used for wallet connect and html metadata
 export const APP_TITLE = process.env.APP_TITLE ?? "Vechain dApp";

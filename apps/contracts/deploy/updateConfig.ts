@@ -13,11 +13,13 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     const B3TR = (await hre.deployments.get('B3TRMock')).address
     const X2EarnRewardsPool = (await hre.deployments.get('X2EarnRewardsPoolMock')).address
     const X2EarnApp = (await hre.deployments.get('X2EarnApp')).address
+    const SimpleAccountFactory = (await hre.deployments.get('SimpleAccountFactory')).address
 
-    const Addresses = { B3TR, X2EarnRewardsPool, X2EarnApp }
+    const Addresses = { B3TR, X2EarnRewardsPool, X2EarnApp, SimpleAccountFactory }
     const ABI = [
         ...(await hre.deployments.get('B3TRMock')).abi,
-        ...(await hre.deployments.get('X2EarnApp')).abi
+        ...(await hre.deployments.get('X2EarnApp')).abi,
+        ...(await hre.deployments.get('SimpleAccountFactory')).abi,
     ]
 
     // Get the genesis block ID from the network
@@ -48,6 +50,6 @@ export const CONTRACTS_NODE_URL = ${JSON.stringify(hre.VeChainProvider?.thorClie
 
 func.id = 'config';
 func.tags = ['config']
-func.dependencies = ['vebetterdao', 'core']
+func.dependencies = ['vebetterdao', 'core', 'aa']
 
 export default func;
