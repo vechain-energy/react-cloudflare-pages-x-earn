@@ -1,6 +1,7 @@
 import { ThorClient, VeChainProvider, ProviderInternalBaseWallet, ProviderInternalHDWallet, Contract } from '@vechain/sdk-network';
-import { Units } from '@vechain/sdk-core'
 import getConfig from './config';
+import { calculateReward } from './calculateReward';
+import { calculateProof, type ProofDetails } from './calculateProof';
 
 const DEFAULT_MNEMONIC = 'denial kitchen pet squirrel other broom bar gas better priority spoil cross';
 const DEFAULT_REWARDER_MNEMONIC_CHILD = 3;
@@ -54,7 +55,8 @@ export default {
 					if (service.service_id === 'withings') {
 						const rewards = await handleRewardForWithings(userId, service, env);
 						if (rewards > 0) {
-							await sendReward(rewards, service.user_id, env)
+							const proof = await calculateProof(rewards, (new Date()).toISOString(), service.user_id, env)
+							await sendReward(rewards, proof, service.user_id, env)
 						}
 					}
 				}
@@ -194,7 +196,7 @@ async function handleRewardForWithings(userId: string, service: OAuthSession, en
 }
 
 
-async function sendReward(amount: number, receiver: string, env: Env) {
+async function sendReward(amount: number, proofDetails: ProofDetails, receiver: string, env: Env) {
 	const { Addresses, ABI, CONTRACTS_NODE_URL } = getConfig(env);
 
 	try {
@@ -214,7 +216,15 @@ async function sendReward(amount: number, receiver: string, env: Env) {
 		const signer = await provider.getSigner(signerAccount.address);
 
 		const x2App = new Contract(Addresses.X2EarnApp, ABI, thor, signer);
-		const result = await x2App.transact.rewardAmountTo(Units.parseUnits(String(amount), 18), receiver);
+		const result = await x2App.transact.rewardAmountWithProofTo(
+			await calculateReward(amount, receiver, env),
+			receiver,
+			proofDetails.proofTypes,
+			proofDetails.proofValues,
+			proofDetails.impactCodes,
+			proofDetails.impactValues,
+			proofDetails.description
+		);
 
 		console.log(`Reward transaction sent. Transaction ID: ${result.id}`);
 
