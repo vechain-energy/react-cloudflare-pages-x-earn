@@ -289,32 +289,34 @@ export const VeChainAccountProvider = ({ children, nodeUrl, delegatorUrl, accoun
         }
 
         const transaction = Transaction.of(txBody)
-        const encoded = transaction.encode()
 
         /**
          * sign the transaction
          * and request the fee delegator to pay the gas fees in the proccess
          */
-        const { signature: delegatorSignature } = await fetch(DELEGATION_URL, {
+        const delegatorResponse = await fetch(DELEGATION_URL, {
             method: 'POST',
             headers: {
                 'content-type': 'application/json',
             },
             body: JSON.stringify({
                 origin: randomTransactionUser.address.toString(),
-                raw: Hex.of(encoded).toString(),
+                raw: Hex.of(transaction.encode()).toString(),
             })
-        }).then(res => res.json() as Promise<{ signature: string, address: string }>)
+        }).then(res => res.json() as Promise<{ signature: string, address: string } | { code: string, message: string}>)
+        
+        if('message' in delegatorResponse) {
+            throw Error(delegatorResponse.message)
+        }
 
+        const delegatorSignature = Hex.of(delegatorResponse.signature)
         const originSignature = Hex.of(Secp256k1.sign(
             transaction.getTransactionHash().bytes,
             randomTransactionUser.privateKey
-        )).toString()
+        ))
 
-        const transactionSignature = nc_utils.concatBytes(Hex.of(originSignature).bytes, Hex.of(delegatorSignature).bytes)
-
+        const transactionSignature = nc_utils.concatBytes(originSignature.bytes, delegatorSignature.bytes)
         const signedTransaction = Transaction.of(transaction.body, transactionSignature)
-        const encodedTransation = Hex.of(signedTransaction.encode(true)).toString()
 
         /**
          * publish the hexlified signed transaction directly on the node api
@@ -325,7 +327,7 @@ export const VeChainAccountProvider = ({ children, nodeUrl, delegatorUrl, accoun
                 'content-type': 'application/json'
             },
             body: JSON.stringify({
-                raw: encodedTransation
+                raw: Hex.of(signedTransaction.encode(true)).toString()
             })
         }).then(res => res.json()) as { id: string }
 
