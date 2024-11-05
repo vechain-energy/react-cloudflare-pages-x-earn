@@ -2,10 +2,11 @@ import { createContext, useContext, useState, useEffect } from 'react'
 import { usePrivy, useWallets, type ConnectedWallet } from '@privy-io/react-auth'
 import { encodeFunctionData, decodeFunctionResult } from 'viem'
 import type { Abi } from 'viem/_types'
-import { Address, Secp256k1 } from '@vechain/sdk-core'
-import { ThorClient } from '@vechain/sdk-network'
+import { Address, Secp256k1, Transaction, Hex } from '@vechain/sdk-core'
 import type { VeChainAccountProviderProps } from './types'
-import { Addresses, ABI, NODE_URL } from '~/config'
+import { Addresses, ABI, NODE_URL, DELEGATION_URL } from '~/config'
+import estimateGas from '@vechain.energy/gas'
+import * as nc_utils from '@noble/curves/abstract/utils';
 
 interface VeChainAccountContextType {
     address: string | undefined;
@@ -265,31 +266,55 @@ export const VeChainAccountProvider = ({ children, nodeUrl, delegatorUrl, accoun
             })
         })
 
-        const thor = ThorClient.fromUrl(NODE_URL)
+        const randomTransactionUser = await generateRandomTransactionUser()
+
         // estimate the gas fees for the transaction
-        const gasResult = await thor.gas.estimateGas(clauses)
+        const gasResult = await estimateGas(clauses, { nodeOrConnex: NODE_URL, caller: randomTransactionUser.address.toString() })
 
         // .. and build the transaction in VeChain format, with delegation enabled
-        const txBody = await thor.transactions.buildTransactionBody(
+        const bestBlock = await fetch(`${NODE_URL}/blocks/best`).then(res => res.json() as Promise<Connex.Thor.Block>)
+        const genesisBlock = await fetch(`${NODE_URL}/blocks/0`).then(res => res.json() as Promise<Connex.Thor.Block>)
+        const txBody = {
+            blockRef: bestBlock.id.slice(0, 18),
+            chainTag: Number(`0x${genesisBlock.id.slice(64)}`),
             clauses,
-            gasResult.totalGas,
-            { isDelegated: true, }
-        )
+            dependsOn: null,
+            expiration: 32,
+            gas: gasResult,
+            gasPriceCoef: 0,
+            nonce: 0,
+            reserved: {
+                features: 1
+            }
+        }
+
+        const transaction = Transaction.of(txBody)
+        const encoded = transaction.encode()
 
         /**
          * sign the transaction
          * and request the fee delegator to pay the gas fees in the proccess
          */
+        const { signature: delegatorSignature } = await fetch(DELEGATION_URL, {
+            method: 'POST',
+            headers: {
+                'content-type': 'application/json',
+            },
+            body: JSON.stringify({
+                origin: randomTransactionUser.address.toString(),
+                raw: Hex.of(encoded).toString(),
+            })
+        }).then(res => res.json() as Promise<{ signature: string, address: string }>)
 
-        const randomTransactionUser = await generateRandomTransactionUser()
-        const wallet = new ProviderInternalBaseWallet(
-            [randomTransactionUser],
-            { delegator: { delegatorUrl } }
-        )
-        const providerWithDelegationEnabled = new VeChainProvider(thor, wallet, true)
-        const signer = await providerWithDelegationEnabled.getSigner(randomTransactionUser)
-        const txInput = signerUtils.transactionBodyToTransactionRequestInput(txBody, randomTransactionUser)
-        const rawDelegateSigned = await signer!.signTransaction(txInput)
+        const originSignature = Hex.of(Secp256k1.sign(
+            transaction.getTransactionHash().bytes,
+            randomTransactionUser.privateKey
+        )).toString()
+
+        const transactionSignature = nc_utils.concatBytes(Hex.of(originSignature).bytes, Hex.of(delegatorSignature).bytes)
+
+        const signedTransaction = Transaction.of(transaction.body, transactionSignature)
+        const encodedTransation = Hex.of(signedTransaction.encode(true)).toString()
 
         /**
          * publish the hexlified signed transaction directly on the node api
@@ -300,7 +325,7 @@ export const VeChainAccountProvider = ({ children, nodeUrl, delegatorUrl, accoun
                 'content-type': 'application/json'
             },
             body: JSON.stringify({
-                raw: rawDelegateSigned
+                raw: encodedTransation
             })
         }).then(res => res.json()) as { id: string }
 

@@ -29,9 +29,12 @@ export function ClaimRewardByContract() {
             const txId = await sendTransaction({
                 to: Addresses.X2EarnApp,
                 value: 0,
-                address: Addresses.X2EarnApp as `0x${string}`,
-                functionName: 'reward',
-                args: [],
+                data: {
+                    abi: ABI,
+                    address: Addresses.X2EarnApp as `0x${string}`,
+                    functionName: 'reward',
+                    args: [],
+                }
             });
             setTxId2(txId);
         }
@@ -67,7 +70,7 @@ export function ClaimRewardByContract() {
             {isError && <ErrorMessage>{error.message}</ErrorMessage>}
             {txId && <Transaction txId={txId} />}
 
----
+            ---
 
             <div>
                 <button
