@@ -1,5 +1,5 @@
-import { NODE_URL, NETWORK, WALLET_CONNECT_PROJECT_ID, APP_TITLE, APP_DESCRIPTION, APP_ICONS, SOLO_BLOCK } from '~/config';
-import { DAppKitProvider, useWallet } from '@vechain/dapp-kit-react'; // Ensure Genesis is imported
+import { NODE_URL, NETWORK, APP_TITLE, DELEGATION_URL, SOLO_BLOCK, PRIVY_APP_ID, Addresses } from '~/config';
+import { useWallet } from '@vechain/dapp-kit-react'; // Ensure Genesis is imported
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { useWagmiConfig } from './hooks/useWagmiConfig';
 import { useAccount, useConnect, useDisconnect, WagmiProvider } from 'wagmi'
@@ -11,19 +11,9 @@ import { Profile } from './Profile';
 import { useEffect } from 'react';
 import { ClaimReward } from './ClaimReward';
 import { ConnectWebApp } from './ConnectWebApp'
+import { VeChainSmartAccountProvider } from '~/modules/smart-accounts';
 
 type Genesis = 'main' | 'test' | Connex.Thor.Block;
-
-// define wallet connect options only in case a project id has been provided
-const walletConnectOptions = !WALLET_CONNECT_PROJECT_ID ? undefined : {
-    projectId: WALLET_CONNECT_PROJECT_ID,
-    metadata: {
-        name: APP_TITLE,
-        description: APP_DESCRIPTION,
-        url: window.location.origin,
-        icons: APP_ICONS
-    },
-};
 
 // query client for react-query
 const queryClient = new QueryClient()
@@ -56,15 +46,31 @@ function Providers({ children }: { children: React.ReactNode }) {
             : undefined;
 
     return (
-        <DAppKitProvider
+        <VeChainSmartAccountProvider
             nodeUrl={NODE_URL}
-            genesis={genesis}
-            usePersistence
-            walletConnectOptions={walletConnectOptions}
-            requireCertificate
+
+            // TODO: This should be a list: smartAccountFactories={["0x.."]}
+            accountFactory={Addresses.SimpleAccountFactory}
+
+            delegatorUrl={DELEGATION_URL}
+
+            loginProviders={[
+                {
+                    provider: "privy",
+                    config: {
+                        appId: PRIVY_APP_ID,
+                        config: {
+                            embeddedWallets: {
+                                createOnLogin: 'users-without-wallets'
+                            }
+                        }
+                    }
+                }
+            ]}
         >
+
             <DAppKitConsumers>{children}</DAppKitConsumers>
-        </DAppKitProvider>
+        </VeChainSmartAccountProvider>
     );
 }
 

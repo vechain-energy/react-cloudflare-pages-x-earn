@@ -1,6 +1,8 @@
 import { Fragment, useState } from 'react';
 import { useAccount, useConnect, useDisconnect, useEnsName } from 'wagmi';
 import { Dialog, Transition } from '@headlessui/react'
+import { usePrivy, useLogin, useLogout } from '@privy-io/react-auth'
+
 
 export function WalletAuth() {
     return (
@@ -8,10 +10,27 @@ export function WalletAuth() {
             <ConnectButton
                 className="rounded-full bg-gray-100 px-4 py-2 text-sm text-gray-900 shadow-sm hover:bg-gray-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-300"
             />
+            <PrivyButton />
         </div>
     );
 }
 
+
+export function PrivyButton() {
+    const { ready, authenticated } = usePrivy()
+    const { login } = useLogin()
+    const { logout } = useLogout()
+
+    return (
+        <button
+            disabled={!ready}
+            onClick={authenticated ? logout : login}
+            className={`px-4 py-2 rounded ${authenticated ? 'bg-red-500 hover:bg-red-700' : 'bg-green-500 hover:bg-green-700'} text-white font-bold`}
+        >
+            {authenticated ? 'Logout' : 'Login'}
+        </button>
+    )
+}
 
 export function ConnectButton({ className }: { className?: string }) {
     const account = useAccount();

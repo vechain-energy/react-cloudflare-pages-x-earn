@@ -11,7 +11,7 @@
     "contracts:build": "npm run build --prefix apps/contracts",
     "website:build": "npm run build --prefix apps/website",
     "build": "npm run contracts:build && npm run website:build",
-    "clear": "rm -rf data/* apps/contracts/deployments/vechain_solo apps/website/.parcel-cache",
+    "clear": "rm -rf data/* apps/contracts/deployments/vechain_solo apps/website/.parcel-cache apps/contracts/deployments/*/.pending*",
 
     "contracts:deploy:testnet": "npm run deploy:testnet --prefix apps/contracts",
     "contracts:deploy:solo": "npm run deploy:solo --prefix apps/contracts",
