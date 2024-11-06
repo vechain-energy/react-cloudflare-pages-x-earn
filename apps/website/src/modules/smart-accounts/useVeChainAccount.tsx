@@ -2,11 +2,10 @@ import { createContext, useContext, useState, useEffect } from 'react'
 import { usePrivy, useWallets, type ConnectedWallet } from '@privy-io/react-auth'
 import { encodeFunctionData, decodeFunctionResult } from 'viem'
 import type { Abi } from 'viem/_types'
-import { Address, Secp256k1, Transaction, Hex } from '@vechain/sdk-core'
+import { Address, Secp256k1, Transaction, Hex, type Clause } from '@vechain/sdk-core'
 import type { VeChainAccountProviderProps } from './types'
 import { Addresses, ABI, NODE_URL, DELEGATION_URL } from '~/config'
 import estimateGas from '@vechain.energy/gas'
-import * as nc_utils from '@noble/curves/abstract/utils';
 
 interface VeChainAccountContextType {
     address: string | undefined;
@@ -72,7 +71,11 @@ export const VeChainAccountProvider = ({ children, nodeUrl, delegatorUrl, accoun
                     })
                     setAddress(address)
                 }
+                else {
+                    console.error('Could not fetch address from Account Factory', result)
+                }
             })
+            .catch(err => console.error('Could not fetch address from Account Factory', err))
     }, [embeddedWallet])
 
 
@@ -115,9 +118,8 @@ export const VeChainAccountProvider = ({ children, nodeUrl, delegatorUrl, accoun
             buttonText?: string
         }): Promise<string> => {
 
-        if (!address || !embeddedWallet) {
-            throw new Error('Address or embedded wallet is missing');
-        }
+        if (!address) { throw new Error('Address could not be load'); }
+        if (!embeddedWallet) { throw new Error('Embedded wallet is missing'); }
 
         // build the object to be signed, containing all information & instructions
         const data = {
@@ -181,7 +183,7 @@ export const VeChainAccountProvider = ({ children, nodeUrl, delegatorUrl, accoun
         /**
          * start building the clauses for the transaction
          */
-        const clauses = []
+        const clauses: Omit<Clause, 'amount'>[] = []
 
         /**
          * if the account address has no code yet, its not been deployed/created yet
@@ -266,57 +268,7 @@ export const VeChainAccountProvider = ({ children, nodeUrl, delegatorUrl, accoun
             })
         })
 
-        const randomTransactionUser = await generateRandomTransactionUser()
-
-        // estimate the gas fees for the transaction
-        const gasResult = await estimateGas(clauses, { nodeOrConnex: NODE_URL, caller: randomTransactionUser.address.toString() })
-
-        // .. and build the transaction in VeChain format, with delegation enabled
-        const bestBlock = await fetch(`${NODE_URL}/blocks/best`).then(res => res.json() as Promise<Connex.Thor.Block>)
-        const genesisBlock = await fetch(`${NODE_URL}/blocks/0`).then(res => res.json() as Promise<Connex.Thor.Block>)
-        const txBody = {
-            blockRef: bestBlock.id.slice(0, 18),
-            chainTag: Number(`0x${genesisBlock.id.slice(64)}`),
-            clauses,
-            dependsOn: null,
-            expiration: 32,
-            gas: gasResult,
-            gasPriceCoef: 0,
-            nonce: 0,
-            reserved: {
-                features: 1
-            }
-        }
-
-        const transaction = Transaction.of(txBody)
-
-        /**
-         * sign the transaction
-         * and request the fee delegator to pay the gas fees in the proccess
-         */
-        const delegatorResponse = await fetch(DELEGATION_URL, {
-            method: 'POST',
-            headers: {
-                'content-type': 'application/json',
-            },
-            body: JSON.stringify({
-                origin: randomTransactionUser.address.toString(),
-                raw: Hex.of(transaction.encode()).toString(),
-            })
-        }).then(res => res.json() as Promise<{ signature: string, address: string } | { code: string, message: string}>)
-        
-        if('message' in delegatorResponse) {
-            throw Error(delegatorResponse.message)
-        }
-
-        const delegatorSignature = Hex.of(delegatorResponse.signature)
-        const originSignature = Hex.of(Secp256k1.sign(
-            transaction.getTransactionHash().bytes,
-            randomTransactionUser.privateKey
-        ))
-
-        const transactionSignature = nc_utils.concatBytes(originSignature.bytes, delegatorSignature.bytes)
-        const signedTransaction = Transaction.of(transaction.body, transactionSignature)
+        const signedTransaction = await clauseToTransaction(clauses)
 
         /**
          * publish the hexlified signed transaction directly on the node api
@@ -327,7 +279,7 @@ export const VeChainAccountProvider = ({ children, nodeUrl, delegatorUrl, accoun
                 'content-type': 'application/json'
             },
             body: JSON.stringify({
-                raw: Hex.of(signedTransaction.encode(true)).toString()
+                raw: Hex.of(signedTransaction.encoded).toString()
             })
         }).then(res => res.json()) as { id: string }
 
@@ -355,4 +307,60 @@ export const useVeChainAccount = () => {
         throw new Error('useVeChainAccount must be used within a VeChainAccountProvider')
     }
     return context
+}
+
+async function clauseToTransaction(clauses: Clause[]): Promise<Transaction> {
+    // generate random user to have something to publish the transaction
+    const randomTransactionUser = await generateRandomTransactionUser()
+
+    // estimate the gas fees for the transaction
+    const gasResult = await estimateGas(clauses, { nodeOrConnex: NODE_URL, caller: randomTransactionUser.address.toString() })
+
+    // .. and build the transaction in VeChain format, with delegation enabled
+    const bestBlock = await fetch(`${NODE_URL}/blocks/best`).then(res => res.json() as Promise<Connex.Thor.Block>)
+    const genesisBlock = await fetch(`${NODE_URL}/blocks/0`).then(res => res.json() as Promise<Connex.Thor.Block>)
+    const transaction = Transaction.of({
+        blockRef: bestBlock.id.slice(0, 18), // block this tx will be built upon, expiration starts here
+        chainTag: Number(`0x${genesisBlock.id.slice(64)}`),
+        clauses,
+        dependsOn: null,
+        expiration: 32,
+        gas: gasResult,
+        gasPriceCoef: 0,
+        nonce: 0,
+        reserved: {
+            features: 1
+        }
+    })
+
+    /**
+     * sign the transaction
+     * and request the fee delegator to pay the gas fees in the proccess
+     */
+    const delegatorResponse = await fetch(DELEGATION_URL, {
+        method: 'POST',
+        headers: {
+            'content-type': 'application/json',
+        },
+        body: JSON.stringify({
+            origin: randomTransactionUser.address.toString(),
+            raw: Hex.of(transaction.encoded).toString(),
+        })
+    }).then(res => res.json() as Promise<{ signature: string, address: string } | { code: string, message: string }>)
+
+    // if delegator rejects sponsorship
+    if ('message' in delegatorResponse) {
+        throw Error(delegatorResponse.message)
+    }
+
+    // transaction signature is origin + delegator combined
+    const delegatorSignature = Hex.of(delegatorResponse.signature)
+    const originSignature = Hex.of(Secp256k1.sign(
+        transaction.getTransactionHash().bytes,
+        randomTransactionUser.privateKey
+    ))
+    const transactionSignature = new Uint8Array([...originSignature.bytes, ...delegatorSignature.bytes]);
+    const signedTransaction = Transaction.of(transaction.body, transactionSignature)
+
+    return signedTransaction
 }
