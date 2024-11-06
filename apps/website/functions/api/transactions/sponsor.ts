@@ -3,6 +3,19 @@ import { Address, HDKey, Transaction, Secp256k1, Hex } from '@vechain/sdk-core';
 // the default signer is a solo node seeded account
 const DEFAULT_SIGNER = 'denial kitchen pet squirrel other broom bar gas better priority spoil cross'
 
+const corsHeaders = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type'
+};
+
+export async function onRequestOptions(): Promise<Response> {
+    return new Response(null, {
+        status: 200,
+        headers: corsHeaders
+    });
+}
+
 export async function onRequestPost({ request, env }): Promise<Response> {
     const body = await request.json()
     console.log('Incoming request', body);
@@ -15,7 +28,7 @@ export async function onRequestPost({ request, env }): Promise<Response> {
         Buffer.from(body.raw.slice(2), 'hex'),
         false
     );
-    const transactionHash = transactionToSign.getSignatureHash(Address.of(body.origin))
+    const transactionHash = transactionToSign.getTransactionHash(Address.of(body.origin))
     const signature = Secp256k1.sign(transactionHash.bytes, signerWallet.privateKey)
 
     return new Response(JSON.stringify({
@@ -24,8 +37,8 @@ export async function onRequestPost({ request, env }): Promise<Response> {
     }), {
         status: 200,
         headers: {
-            'Content-Type': 'application/json',
-            'access-control-allow-origin': '*'
+            ...corsHeaders,
+            'Content-Type': 'application/json'
         }
     })
 }
